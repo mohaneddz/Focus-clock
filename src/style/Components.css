@@ -67,3 +67,25 @@ input[type="number"] {
 input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(100%);
 }
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0b0e1700;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #13afd27a;
+  border-radius: 4px;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

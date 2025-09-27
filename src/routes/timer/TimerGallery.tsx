@@ -83,15 +83,19 @@ export default function TimerGallery() {
 
       </Modal>
 
-      <section class="full grid grid-cols-6 grid-rows-6 content-center gap-8 py-40 px-20">
+      <div class="full py-40 px-10 lg:px-20 overflow-y-scroll">
 
-        <For each={timers()}>
-          {(timer) => <TimerCard id={timer?.id || 0} duration={timer?.duration || 0} title={timer?.title || ""} onEdit={() => openEditModal(timer)} onDelete={() => deleteTimer(timer.id)} />}
-        </For>
+        <section class="w-full flex content-center gap-8 flex-wrap">
 
-        <NewTimerCard onClick={() => setNewTimerModalOpen(true)} />
+          <For each={timers()}>
+            {(timer) => <TimerCard id={timer?.id || 0} duration={timer?.duration || 0} title={timer?.title || ""} onEdit={() => openEditModal(timer)} onDelete={() => deleteTimer(timer.id)} />}
+          </For>
 
-      </section>
+          <NewTimerCard onClick={() => setNewTimerModalOpen(true)} />
+
+        </section>
+
+      </div>
 
     </>
   );
