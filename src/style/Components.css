@@ -1,0 +1,69 @@
+input[type="number"]
+{
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+  appearance: textfield;
+  color: #f3f4f6;
+  padding: 0.2rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  text-align: center;
+  user-select: all;
+}
+
+input[type="time"]
+{
+  /* @apply bg-sidebar-light-2;  */
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+  appearance: textfield;
+  color: #f3f4f6;
+  padding: 0.2rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  text-align: center;
+  user-select: all;
+}
+
+input[type="time"]:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 2px #60a5fa33;
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
+input[type="time"]::-webkit-datetime-edit-ampm-field {
+  display: none;
+}
+
+input[type="time"]::-ms-clear {
+  display: none;
+}
+
+input[type="time"]::-ms-expand {
+  display: none;
+}
+
+/* Hide number input spinners (Chrome, Safari, Edge) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide number input spinners (Firefox) */
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(100%);
+}
