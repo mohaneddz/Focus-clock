@@ -18,7 +18,7 @@ export default function TimerCard(props: Props) {
     };
 
     return (
-        <div class="relative p-6 bg-primary-light-3 rounded-lg shadow-md center col h-80 w-60">
+        <div class="relative p-6 bg-primary-light-3 rounded-lg shadow-md center col h-60 w-40 lg:h-80 lg:w-60">
             <button class="absolute top-2 right-2 text-white/40 hover:text-white click" onClick={props.onDelete}>
                 <Trash size={16} />
             </button>
@@ -28,11 +28,11 @@ export default function TimerCard(props: Props) {
 
             <div class="flex gap-4 w-full justify-center items-center content-center">
 
-                <a class="mt-4 bg-primary-light-2 rounded-full center aspect-square click h-16 w-16" href={`/timer/${props.id}`}>
+                <a class="mt-4 bg-primary-light-2 rounded-full center aspect-square click w-8 h-8 lg:h-16 lg:w-16" href={`/timer/${props.id}`}>
                     <Play size={16} />
                 </a>
 
-                <button class="mt-4 bg-primary-light-2 rounded-full center aspect-square click h-16 w-16" onClick={props.onEdit}>
+                <button class="mt-4 bg-primary-light-2 rounded-full center aspect-square click w-8 h-8 lg:h-16 lg:w-16" onClick={props.onEdit}>
                     <Pen size={16} />
                 </button>
 
