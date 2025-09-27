@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+.full {
+  @apply h-full w-full;
+}
+
+.center {
+  @apply flex items-center justify-center;
+}
+
+.col {
+  @apply flex flex-col;
+}
+
+.click {
+  @apply cursor-pointer hover:scale-105 transition-all duration-200 ease-in-out active:scale-95;
+}
+
+.titlebar {
+  height: 30px;
+  user-select: none;
+  display: flex;
+  justify-content: flex-end;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.titlebar-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  user-select: none;
+  -webkit-user-select: none;
+  filter: invert(1);
+  z-index: 1000;
+}
+
+.titlebar-button:hover {
+  background: #5a77a2;
+  z-index: 1000;
+
+}
+
+::selection {
+  background: #748fb9;
+  color: white;
+}
