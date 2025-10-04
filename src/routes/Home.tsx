@@ -11,7 +11,14 @@ export default function Home() {
     onCleanup(() => clearInterval(timer));
   });
 
-  const formattedTime = () => time().toLocaleTimeString([], { hour12: false });
+  const formattedTime = () => {
+    const t = time();
+    let hours = t.getHours();
+    const minutes = t.getMinutes().toString().padStart(2, '0');
+    const seconds = t.getSeconds().toString().padStart(2, '0');
+    hours = hours % 12 || 12;
+    return `${hours}:${minutes}:${seconds}`;
+  };
 
   return (
     <div class="center col gap-8">
