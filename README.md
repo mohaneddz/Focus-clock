@@ -1,45 +1,42 @@
-Got it ✅ — here’s your **Focus Clock README rewritten in the same style/structure as your Waldo Finder project**:
-
----
-
 <h1 style="font-family: Arial, sans-serif; font-size: 36px; color: #E63946; display: flex; align-items: center; border-bottom: 3px solid #E63946; padding-bottom: 5px;">
     <img src="screenshots/Icon.png" alt="Focus Clock Icon" style="width: 50px; height: 50px; margin-right: 15px;">
     Focus Clock ⏳
 </h1>
 
-Focus Clock is a modern, cross-platform productivity timer app that helps you stay focused with customizable timers and Pomodoro sessions. Built with **Tauri**, **SolidJS**, and **TypeScript** for speed, simplicity, and local performance.
-
-This app was built in just 2 hours and designed specifically for display on a second monitor to keep you focused without cluttering your main screen.
+Focus Clock is a small desktop productivity timer app combining a Pomodoro-technique timer with
+custom, user-created timers. Built with **Tauri**, **SolidJS**, and **TypeScript**, and designed to
+sit on a second monitor as a lightweight companion so it doesn't clutter your main screen. This is
+an early alpha release — it was built quickly and covers Phase 1 of its own roadmap.
 
 ---
 
 ## Tech Used 🧑‍💻
 
-![Tauri](https://img.shields.io/badge/Tauri-24C8B1?style=for-the-badge\&logo=tauri\&logoColor=white)
-![SolidJS](https://img.shields.io/badge/SolidJS-2D8CFF?style=for-the-badge\&logo=solid\&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge\&logo=typescript\&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge\&logo=tailwindcss\&logoColor=white)
-![Rust](https://img.shields.io/badge/Rust-000000?style=for-the-badge\&logo=rust\&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge\&logo=vite\&logoColor=white)
+![Tauri](https://img.shields.io/badge/Tauri-24C8B1?style=for-the-badge&logo=tauri&logoColor=white)
+![SolidJS](https://img.shields.io/badge/SolidJS-2D8CFF?style=for-the-badge&logo=solid&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Rust](https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 
 ---
 
 ## Core Features ⚡
 
 * 🍅 **Pomodoro Timer:**
-  Classic Pomodoro technique with customizable work/break intervals.
+  Configurable work/break intervals (`src/routes/pomodoro`).
 
 * ⏲️ **Custom Timers:**
-  Create and manage multiple timers for different tasks.
-
-* 🎨 **Modern UI:**
-  Clean, responsive interface powered by SolidJS + TailwindCSS.
-
-* 💻 **Cross-Platform:**
-  Works on Windows, macOS, and Linux with Tauri backend.
+  Create, save, and manage multiple named timers (`src/routes/timer`).
 
 * 💾 **Persistent Settings:**
-  Your preferences and timer configurations are saved locally.
+  Timer configuration and preferences saved locally via `tauri-plugin-store`.
+
+* 🎨 **Minimal UI:**
+  Custom titlebar and a simple navigation menu, built with SolidJS + Tailwind CSS.
+
+* 💻 **Lightweight:**
+  Minimal Rust dependency footprint — no networking, just local settings storage.
 
 ---
 
@@ -68,10 +65,10 @@ This app was built in just 2 hours and designed specifically for display on a se
 <br>
 <img src="screenshots/pomodoro settings.png" alt="Settings Screen" width="70%"/>
 
-**Pomodoro Settings:** Here you can save your pomodoro preferences.
+**Pomodoro Settings:** Save your Pomodoro preferences.
 
 <br>
-<img src="screenshots/about.png" alt="Settings Screen" width="70%"/>
+<img src="screenshots/about.png" alt="About Screen" width="70%"/>
 
 **About:** About page that describes the project.
 
@@ -81,16 +78,17 @@ This app was built in just 2 hours and designed specifically for display on a se
 
 ```plaintext
 src/
-├── components/       # Reusable UI components
-├── routes/           # Pages and routing
-├── hooks/            # Custom hooks for timer logic
-├── config/           # App configuration
+├── components/       # Reusable UI components (Titlebar, Navigation, ...)
+├── routes/
+│   ├── pomodoro/     # PomodoroMain, PomodoroSettings, usePomodoro
+│   └── timer/        # TimerMain, TimerGallery, TimerCard, NewTimerCard, useTimer
+├── config/           # store.ts — persistent settings
 ├── types/            # TypeScript types
-└── style/            # TailwindCSS styles
+└── style/            # Tailwind styles
 
-src-tauri/            # Tauri backend (Rust)
-├── src/              # Rust source code
-└── tauri.conf.json   # Tauri config
+src-tauri/            # Tauri backend (Rust) — minimal, store + serde only
+├── src/
+└── tauri.conf.json
 ```
 
 ---
@@ -103,60 +101,38 @@ src-tauri/            # Tauri backend (Rust)
    * pnpm
    * Rust (latest stable)
 
-2. **Clone and install dependencies:**
+2. **Install dependencies:**
 
-   ```sh
-   git clone <repository-url>
-   cd focus-clock
+   ```bash
    pnpm install
    ```
 
 3. **Run in development mode:**
 
-   ```sh
-   pnpm start
+   ```bash
+   pnpm tauri dev
    ```
 
 4. **Build for production:**
 
-   ```sh
+   ```bash
    pnpm build
    pnpm tauri build
    ```
 
-   The app will be available in `src-tauri/target/release/`.
-
----
-
-## Recommended IDE Setup 💻
-
-* [VS Code](https://code.visualstudio.com/)
-* [Tauri for VS Code](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode)
-* [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
-
----
-
-## Contributing 👥
-
-Contributions are welcome!
-If you want to fix bugs, add features, or improve the codebase:
-
-1. Fork the repo
-2. Create a feature branch (`git checkout -b feature/MyFeature`)
-3. Make your changes and test
-4. Push and open a Pull Request
+   The bundled app will be available under `src-tauri/target/release/`.
 
 ---
 
 ## Roadmap 🗺️
 
-### Phase 1: Core Functionality
+### Phase 1: Core Functionality — done
 
 * [x] Pomodoro timer with intervals
 * [x] Custom timers
 * [x] Persistent settings
 
-### Phase 2: Enhanced Features
+### Phase 2: Enhanced Features — not started
 
 * [ ] Stats and reports
 * [ ] Advanced theming
@@ -164,17 +140,7 @@ If you want to fix bugs, add features, or improve the codebase:
 
 ---
 
-## License ⚖️
+## Current Status
 
-MIT License – see `LICENSE` file for details.
-
----
-
-## Contact 📬
-
-* GitHub: [mohaneddz](https://github.com/mohaneddz)
-* Email: [mohaned.manaa.dev@gmail.com](mailto:mohaned.manaa.dev@gmail.com)
-
----
-
-Do you want me to also add **fancy shields for features (like Pomodoro, timers, cross-platform)** to make it match the “flashy” vibe of your old readme?
+Alpha (`0.1.0`). Phase 1 is complete and working; Phase 2 items above haven't been started. There's
+a leftover, unused `src/temp/settings.tsx` from an earlier settings rewrite that never got wired in.
