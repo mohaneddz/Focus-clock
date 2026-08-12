@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "focus-clock",
+  "productName": "Focus Clock",
   "version": "0.1.0",
   "identifier": "com.mohaned.focus-clock",
   "build": {
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "focus-clock",
+        "title": "Focus Clock",
         "width": 800,
         "height": 600,
         "decorations": false
