@@ -1,3 +1,5 @@
+![Focus Clock](screenshots/cover.avif)
+
 <h1 style="font-family: Arial, sans-serif; font-size: 36px; color: #E63946; display: flex; align-items: center; border-bottom: 3px solid #E63946; padding-bottom: 5px;">
     <img src="screenshots/Icon.png" alt="Focus Clock Icon" style="width: 50px; height: 50px; margin-right: 15px;">
     Focus Clock ⏳
