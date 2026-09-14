@@ -22,13 +22,13 @@ export default function TimerGallery(){
   const d=drag;if(!d)return;
   if(dragId()!==d.id){if(Math.hypot(e.clientX-d.startX,e.clientY-d.startY)<5)return;setDragId(d.id)}
   glue(e.clientX,e.clientY);
-  const overId=document.elementsFromPoint(e.clientX,e.clientY).map(el=>(el as HTMLElement).closest?.(".timer-card[data-id]")).find(el=>el&&(el as HTMLElement).dataset.id!==String(d.id));
-  if(!overId)return;
-  const targetId=Number((overId as HTMLElement).dataset.id);
-  const list=timers(),from=list.findIndex(x=>x.id===d.id),to=list.findIndex(x=>x.id===targetId);
-  if(from<0||to<0||from===to)return;
-  const before=snapshot();
-  const next=[...list];next.splice(to,0,next.splice(from,1)[0]);setTimers(next);
+  // detect drop index from layout geometry (offset*), which ignores the in-flight FLIP transforms and stays stable
+  const op=d.el.offsetParent as HTMLElement|null,opRect=op?op.getBoundingClientRect():{left:0,top:0} as DOMRect,px=e.clientX-opRect.left,py=e.clientY-opRect.top;
+  const list=timers(),rest=list.filter(t=>t.id!==d.id);
+  let idx=0;for(const t of rest){const el=refs.get(t.id);if(!el)continue;const cx=el.offsetLeft+el.offsetWidth/2,cy=el.offsetTop+el.offsetHeight/2,h=el.offsetHeight;if(cy<py-h*0.5||(Math.abs(cy-py)<=h*0.5&&cx<px))idx++}
+  const next=[...rest];next.splice(idx,0,list.find(t=>t.id===d.id)!);
+  if(next.every((t,i)=>t.id===list[i].id))return;
+  const before=snapshot();setTimers(next);
   queueMicrotask(()=>{if(drag!==d)return;const b=before.get(d.id)!,a=d.el.getBoundingClientRect();d.startX+=a.left-b.left;d.startY+=a.top-b.top;glue(e.clientX,e.clientY);flip(before,d.id)});
  };
  const endDrag=(e:PointerEvent)=>{
