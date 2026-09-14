@@ -1,4 +1,4 @@
-import { createSignal, onCleanup, onMount } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 import { A, useParams } from "@solidjs/router";
 import { Pause, Play, RotateCcw, Volume2, VolumeX } from "lucide-solid";
 import { getStoreValue, setStoreValue } from "@/config/store";
@@ -8,14 +8,19 @@ import ClockRing from "@/components/ClockRing";
 type TimerData = { id: number; title: string; duration: number };
 const fmt = (seconds: number) => `${Math.floor(seconds / 60).toString().padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`;
 
+// Module-level state so a running countdown survives navigating to another
+// route and back (e.g. Timer -> Settings -> Timer) instead of resetting. Only
+// one timer can run at a time, so it's reset when a *different* timer id mounts.
+let activeTimerId: number | null = null;
+const [left, setLeft] = createSignal(0);
+const [running, setRunning] = createSignal(false);
+let end = 0;
+let tick: number | undefined;
+
 export default function TimerMain() {
   const id = Number(useParams().id);
   const [timer, setTimer] = createSignal<TimerData | null>(null);
-  const [left, setLeft] = createSignal(0);
-  const [running, setRunning] = createSignal(false);
   const { muted, toggleMuted } = useTickingSound(left, running);
-  let end = 0;
-  let tick: number | undefined;
 
   const complete = async () => {
     const currentTimer = timer();
@@ -36,9 +41,13 @@ export default function TimerMain() {
   onMount(async () => {
     const found = ((await getStoreValue<TimerData[]>("timers")) || []).find((item) => item.id === id);
     setTimer(found || null);
-    setLeft(found?.duration || 0);
+    if (activeTimerId !== id) {
+      activeTimerId = id;
+      clearInterval(tick);
+      setRunning(false);
+      setLeft(found?.duration || 0);
+    }
   });
-  onCleanup(() => clearInterval(tick));
 
   const toggle = () => {
     if (running()) {

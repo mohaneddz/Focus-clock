@@ -1,4 +1,4 @@
-import { createSignal, onCleanup, onMount, For } from "solid-js";
+import { createSignal, onMount, For } from "solid-js";
 import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw, Square, Volume2, VolumeX } from "lucide-solid";
 import { getStoreValue } from "@/config/store";
 import { playChime } from "@/config/sounds";
@@ -9,16 +9,20 @@ type Config = { pomodoroTimeSeconds: number; shortBreakTimeSeconds: number; long
 const defaults: Config = { pomodoroTimeSeconds: 1500, shortBreakTimeSeconds: 300, longBreakTimeSeconds: 900, numberOfRounds: 4 };
 const fmt =(seconds: number) => `${Math.floor(seconds / 60).toString().padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`;
 
+// Module-level state so the running session survives navigating to another
+// route and back (e.g. Pomodoro -> Settings -> Pomodoro) instead of resetting.
+const [config, setConfig] = createSignal(defaults);
+const [mode, setMode] = createSignal<"focus" | "short" | "long">("focus");
+const [left, setLeft] = createSignal(defaults.pomodoroTimeSeconds);
+const [running, setRunning] = createSignal(false);
+const [sessions, setSessions] = createSignal(0);
+const [laps, setLaps] = createSignal(0);
+let end = 0;
+let tick: number | undefined;
+let settingsLoaded = false;
+
 export default function Pomodoro() {
-  const [config, setConfig] = createSignal(defaults);
-  const [mode, setMode] = createSignal<"focus" | "short" | "long">("focus");
-  const [left, setLeft] = createSignal(defaults.pomodoroTimeSeconds);
-  const [running, setRunning] = createSignal(false);
-  const [sessions, setSessions] = createSignal(0);
-  const [laps, setLaps] = createSignal(0);
   const { muted, toggleMuted } = useTickingSound(left, running);
-  let end = 0;
-  let tick: number | undefined;
 
   const duration = () => mode() === "focus" ? config().pomodoroTimeSeconds : mode() === "short" ? config().shortBreakTimeSeconds : config().longBreakTimeSeconds;
   const choose = (nextMode: "focus" | "short" | "long") => {
@@ -63,9 +67,9 @@ export default function Pomodoro() {
   };
   onMount(async () => {
     const stored = (await getStoreValue<Config>("pomodoro-settings")) || defaults;
-    setConfig(stored); setLeft(stored.pomodoroTimeSeconds);
+    setConfig(stored);
+    if (!settingsLoaded) { setLeft(stored.pomodoroTimeSeconds); settingsLoaded = true; }
   });
-  onCleanup(() => clearInterval(tick));
   const toggle = () => {
     if (running()) { clearInterval(tick); setRunning(false); }
     else { end = Date.now() + left() * 1000; tick = window.setInterval(update, 250); setRunning(true); }
