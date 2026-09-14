@@ -159,6 +159,12 @@
 .titlebar { transition: grid-template-columns 520ms cubic-bezier(.22, 1, .36, 1), opacity 360ms ease, transform 520ms cubic-bezier(.22, 1, .36, 1), padding 520ms cubic-bezier(.22, 1, .36, 1); }
 
 .sidebar { min-width: 0; overflow: hidden; }
+.page-wrap::after {
+  top: calc(90px + min(19.5vw, 32vh, 310px));
+  left: calc(210px + (100vw - 210px) / 2);
+  transform: translate(-50%, -50%);
+  transform-origin: center;
+}
 .focus-exit-hint {
   position: fixed;
   left: 50%;
@@ -174,6 +180,7 @@
 .focus-exit-hint kbd { padding: 3px 7px; border: 1px solid #53798e; border-radius: 4px; background: #082333; }
 
 html.focus-mode .app { grid-template-columns: 0 1fr; }
+html.focus-mode .page-wrap::after { top: 50%; left: 50%; }
 html.focus-mode .sidebar { width: 0; padding-left: 0; padding-right: 0; border-right-color: transparent; opacity: 0; transform: translateX(-100%); pointer-events: none; }
 html.focus-mode .page-wrap { padding: 30px; overflow: hidden; }
 html.focus-mode .home { justify-content: center; gap: 0; min-height: calc(100dvh - 60px); padding: 0; }
@@ -187,6 +194,7 @@ html.focus-mode .focus-exit-hint { opacity: .75; transform: translate(-50%, 0); 
 html.focus-mode .titlebar { opacity: 0; pointer-events: none; }
 
 @media (max-height: 820px) {
+  .page-wrap::after { top: calc(76px + min(18.5vw, 29.5vh, 270px)); }
   .home { gap: 20px; padding: 4px 0 8px; }
   .home-clock { width: min(37vw, 59vh, 540px); min-width: 350px; }
   .home-clock-content .eyebrow { margin-bottom: 34px; }
@@ -197,12 +205,18 @@ html.focus-mode .titlebar { opacity: 0; pointer-events: none; }
 }
 
 @media (max-width: 620px) {
+  .page-wrap::after { top: calc(78px + min(41vw, 29vh)); }
   .home-clock { width: min(82vw, 58vh); min-width: 280px; }
   .home-clock-content .eyebrow { margin-bottom: 28px; }
   .home-date-stack { margin-top: 34px; }
   .home-cta { min-width: min(390px, 86vw); font-size: 16px; padding-left: 20px; gap: 12px; }
   .titlebar { padding-right: 4px; }
   .titlebar-button { width: 38px; }
+}
+
+@media (max-width: 950px) {
+  .page-wrap::after { left: calc(70px + (100vw - 70px) / 2); }
+  html.focus-mode .page-wrap::after { left: 50%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
