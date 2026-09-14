@@ -1,9 +1,13 @@
 /* Refined home geometry and compact native window controls. */
 .titlebar {
   height: 40px;
+  left: auto;
+  width: auto;
   padding: 4px 8px 0;
   align-items: flex-start;
   pointer-events: none;
+  background: transparent;
+  border: 0;
 }
 
 .window-controls {
@@ -41,53 +45,14 @@
   box-shadow: none;
 }
 
-/* The scroll container begins after the titlebar, so the window controls
-   remain above it. The native scrollbar carries the app's blue-glass finish. */
-.titlebar {
-  z-index: 20;
-  background: linear-gradient(90deg, #061e2c 0%, #082b3f 72%, #0a344a 100%);
-  border-bottom: 1px solid #174b63;
-  box-shadow: 0 7px 20px #020d1538;
-}
-
-.page-wrap {
-  height: calc(100vh - 40px);
-  margin-top: 40px;
-  padding-top: 32px;
-  overflow-x: hidden;
-  overflow-y: auto;
-  scrollbar-gutter: stable;
-  scrollbar-color: #3fc5e4 #061d2a;
-  scrollbar-width: thin;
-}
-
-.page-wrap::-webkit-scrollbar { width: 12px; }
-
-.page-wrap::-webkit-scrollbar-track {
-  background: #061d2a;
-  border-left: 1px solid #17475d;
-}
-
-.page-wrap::-webkit-scrollbar-thumb {
-  min-height: 48px;
-  border: 3px solid #061d2a;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #6ce6fb 0%, #249fc5 100%);
-  box-shadow: inset 0 0 0 1px #a4f4ff80, 0 0 8px #33cce05c;
-}
-
-.page-wrap::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #a0f4ff 0%, #36b9dc 100%);
-}
-
 .home {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: 28px;
   min-height: calc(100dvh - 102px);
-  padding: 8px 0 20px;
+  padding: 18px 0 20px;
 }
 
 .home-clock {
@@ -111,7 +76,7 @@
 
 .home-clock-content .time {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: center;
   width: 100%;
   font-size: clamp(76px, 8.2vw, 142px);
@@ -127,6 +92,7 @@
   font-size: .46em;
   letter-spacing: -.045em;
   color: #83abc9;
+  transform: translateY(.16em);
 }
 
 .home-date-stack {
@@ -178,7 +144,7 @@
 }
 
 @media (max-height: 820px) {
-  .home { gap: 20px; padding-bottom: 8px; }
+  .home { gap: 20px; padding: 4px 0 8px; }
   .home-clock { width: min(37vw, 59vh, 540px); min-width: 350px; }
   .home-clock-content .eyebrow { margin-bottom: 34px; }
   .home-date-stack { margin-top: 40px; }
