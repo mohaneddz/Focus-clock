@@ -15,7 +15,8 @@
         "title": "Focus Clock",
         "width": 800,
         "height": 600,
-        "decorations": false
+        "decorations": false,
+        "visible": false
       }
     ],
     "security": {
