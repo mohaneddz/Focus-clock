@@ -63,6 +63,8 @@ export const playTick = (override?: TickVariant, scale = 1) => {
     }
     const oscillator = ctx.createOscillator();
     const gain = ctx.createGain();
+    oscillator.connect(gain).connect(ctx.destination);
+    oscillator.start();
     if (kind === "wood") {
       oscillator.type = "triangle";
       oscillator.frequency.setValueAtTime(900, now);
@@ -83,8 +85,6 @@ export const playTick = (override?: TickVariant, scale = 1) => {
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
       oscillator.stop(now + 0.04);
     }
-    oscillator.connect(gain).connect(ctx.destination);
-    oscillator.start();
   } catch {
     // Browsers can defer audio until the user has interacted with the page.
   }
