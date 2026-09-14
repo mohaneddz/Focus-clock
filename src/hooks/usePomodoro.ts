@@ -25,6 +25,12 @@ const [intervalId, setIntervalId] = createSignal<NodeJS.Timeout | null>(null);
 const [isInitialized, setIsInitialized] = createSignal(false);
 const [pomodorosCompleted, setPomodorosCompleted] = createSignal(0);
 
+// Anchor for drift-free countdown: recomputed from wall-clock time on every
+// tick and on visibilitychange, so backgrounded/throttled intervals (window
+// minimized, minimized to tray, tab hidden) still land on the correct value.
+let endTime: number | undefined;
+let visibilityListenerAttached = false;
+
 export default function usePomodoro() {
 	const getCurrentTimerDuration = () => {
 		if (turn() === 0) {
@@ -86,7 +92,26 @@ export default function usePomodoro() {
 		const nextDuration = getCurrentTimerDuration();
 		setTimeLeft(nextDuration);
 		setIsActive(true);
+		endTime = Date.now() + nextDuration * 1000;
 		return nextDuration;
+	};
+
+	const syncFromEndTime = () => {
+		if (endTime === undefined) return;
+		const remaining = Math.max(0, Math.round((endTime - Date.now()) / 1000));
+		if (remaining <= 0) {
+			setTimeLeft(handleTimerComplete());
+		} else {
+			setTimeLeft(remaining);
+		}
+	};
+
+	const attachVisibilityListener = () => {
+		if (visibilityListenerAttached) return;
+		visibilityListenerAttached = true;
+		document.addEventListener('visibilitychange', () => {
+			if (document.visibilityState === 'visible' && isActive()) syncFromEndTime();
+		});
 	};
 
 	const resetTimer = () => {
@@ -99,6 +124,7 @@ export default function usePomodoro() {
 			clearInterval(intervalId()!);
 			setIntervalId(null);
 		}
+		endTime = undefined;
 		// Reset to the beginning of current phase
 		resetTimer();
 	};
@@ -109,6 +135,7 @@ export default function usePomodoro() {
 			clearInterval(intervalId()!);
 			setIntervalId(null);
 		}
+		endTime = undefined;
 		// Reset to pomodoro phase and round count
 		setTurn(0);
 		setPomodorosCompleted(0);
@@ -116,6 +143,7 @@ export default function usePomodoro() {
 	};
 
 	const handlePlay = () => {
+		attachVisibilityListener();
 		if (isActive()) {
 			// Pause the timer
 			setIsActive(false);
@@ -123,20 +151,12 @@ export default function usePomodoro() {
 				clearInterval(intervalId()!);
 				setIntervalId(null);
 			}
+			endTime = undefined;
 		} else {
 			// Start the timer
 			setIsActive(true);
-			setIntervalId(
-				setInterval(() => {
-					setTimeLeft((prev) => {
-						if (prev <= 1) {
-							// Timer finished
-							return handleTimerComplete();
-						}
-						return prev - 1;
-					});
-				}, 1000)
-			);
+			endTime = Date.now() + timeLeft() * 1000;
+			setIntervalId(setInterval(syncFromEndTime, 1000));
 		}
 	};
 

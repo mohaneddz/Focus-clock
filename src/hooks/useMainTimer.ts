@@ -12,6 +12,26 @@ export default function useMainTimer() {
 	const [isActive, setIsActive] = createSignal(false);
 
 	let interval: number | undefined;
+	let endTime: number | undefined;
+
+	const syncFromEndTime = () => {
+		if (endTime === undefined) return;
+		const remaining = Math.max(0, Math.round((endTime - Date.now()) / 1000));
+		setRemainingTime(remaining);
+		if (remaining <= 0) {
+			setIsActive(false);
+			if (interval) {
+				clearInterval(interval);
+				interval = undefined;
+			}
+			endTime = undefined;
+		}
+		updateStore();
+	};
+
+	const handleVisibilityChange = () => {
+		if (document.visibilityState === 'visible') syncFromEndTime();
+	};
 
 	onMount(async () => {
 		const timers = (await getStoreValue<Timer[]>('timers')) || [];
@@ -21,10 +41,12 @@ export default function useMainTimer() {
 			setRemainingTime(timer.duration);
 			setTitle(timer.title);
 		}
+		document.addEventListener('visibilitychange', handleVisibilityChange);
 	});
 
 	onCleanup(() => {
 		if (interval) clearInterval(interval);
+		document.removeEventListener('visibilitychange', handleVisibilityChange);
 	});
 
 	const formatTime = (seconds: number) => {
@@ -46,18 +68,8 @@ export default function useMainTimer() {
 	const startTimer = () => {
 		if (remainingTime() <= 0) return;
 		setIsActive(true);
-		interval = setInterval(() => {
-			setRemainingTime((prev) => {
-				const newTime = prev - 1;
-				if (newTime <= 0) {
-					setIsActive(false);
-					clearInterval(interval);
-					return 0;
-				}
-				updateStore();
-				return newTime;
-			});
-		}, 1000) as unknown as number;
+		endTime = Date.now() + remainingTime() * 1000;
+		interval = setInterval(syncFromEndTime, 1000) as unknown as number;
 	};
 
 	const pauseTimer = () => {
@@ -66,6 +78,7 @@ export default function useMainTimer() {
 			clearInterval(interval);
 			interval = undefined;
 		}
+		endTime = undefined;
 		updateStore();
 	};
 
@@ -75,6 +88,7 @@ export default function useMainTimer() {
 			clearInterval(interval);
 			interval = undefined;
 		}
+		endTime = undefined;
 		setRemainingTime(totalTime());
 		updateStore();
 	};
