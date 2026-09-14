@@ -285,3 +285,114 @@ html.focus-mode .pomodoro .clock-face { width: min(76vw, 86vh, 900px); margin: 0
 @media (prefers-reduced-motion: reduce) {
   .app,.sidebar,.page-wrap,.titlebar,.home-clock,.home-clock-content,.home-clock-content .time,.home-clock-content .eyebrow,.home-date-stack,.home-actions,.focus-exit-hint { transition-duration: .01ms !important; transition-delay: 0ms !important; }
 }
+
+/* Responsive clock geometry. Typography derives from the circle instead of
+   viewport width, so short/wide windows cannot make the time overflow it. */
+.home-clock,
+.timer-main > .clock-face,
+.pomodoro .clock-face { container-type: inline-size; }
+
+.home-clock-content .eyebrow {
+  margin-bottom: clamp(16px, 6cqi, 43px);
+  font-size: clamp(9px, 1.75cqi, 13px);
+}
+
+.home-clock-content .time {
+  font-size: clamp(48px, 20cqi, 190px);
+}
+html.focus-mode .home-clock-content .time { font-size: clamp(48px, 20cqi, 190px); }
+
+.home-date-stack {
+  gap: clamp(6px, 1.6cqi, 12px);
+  margin-top: clamp(18px, 6.5cqi, 50px);
+}
+
+.home-date-stack .date { font-size: clamp(15px, 3.7cqi, 28px); }
+.home-date-stack .muted { font-size: clamp(11px, 2cqi, 15px); }
+.clock-sound-toggle {
+  right: clamp(13px, 3.2cqi, 24px);
+  bottom: clamp(13px, 3.2cqi, 24px);
+  width: clamp(31px, 5cqi, 38px);
+  height: clamp(31px, 5cqi, 38px);
+}
+.clock-focus-toggle { right: auto; left: clamp(13px, 3.2cqi, 24px); }
+.page-wrap::after { left: calc(var(--sidebar-width) + (100vw - var(--sidebar-width)) / 2); }
+
+.timer-main {
+  --timer-circle-size: min(calc(100vw - var(--sidebar-width) - 84px), calc(100dvh - 230px), 570px);
+  height: calc(100dvh - 102px);
+  min-height: 0;
+}
+.timer-main > .clock-face { width: var(--timer-circle-size); height: var(--timer-circle-size); aspect-ratio: 1 / 1; }
+.timer-main .timer-time { font-size: clamp(54px, 23cqi, 150px); }
+.timer-main .eyebrow { font-size: clamp(9px, 2.3cqi, 13px); }
+.timer-main .date { margin-top: clamp(16px, 5cqi, 30px); font-size: clamp(16px, 4.7cqi, 27px); }
+.timer-actions { top: auto; bottom: 0; }
+
+@media (max-height: 760px) {
+  .home {
+    --home-controls-height: 58px;
+    --home-circle-size: min(calc(100vw - 294px), calc(100dvh - 210px), 900px);
+  }
+  .home-cta { min-height: 56px; padding-block: 6px; }
+  .home-cta .round-button { width: 44px; height: 44px; }
+  .timer-main { --timer-circle-size: min(calc(100vw - var(--sidebar-width) - 70px), calc(100dvh - 190px), 570px); }
+  .pomodoro { gap: 24px; }
+  .pomodoro .tabs { margin-bottom: 18px; }
+  .pomodoro .clock-face { width: min(42vw, calc(100dvh - 225px), 500px); }
+  .pomodoro-actions { margin-top: 18px; }
+  .today { min-height: 0; padding: 22px; }
+  .session-count { margin: 18px 0 12px; font-size: 42px; }
+  .section-rule { margin: 20px 0; }
+  .about { margin-top: 22px; gap: 38px; }
+  .about-mark { width: min(29vw, 42vh, 350px); }
+  .about h1 { margin: 18px 0; font-size: clamp(40px, 4vw, 54px); }
+  .feature-row { margin: 24px 0; }
+  .about-footer { margin-top: 22px; }
+}
+
+@media (max-width: 950px) {
+  .timer-main { --timer-circle-size: min(calc(100vw - 126px), calc(100dvh - 230px), 570px); }
+  .pomodoro { gap: 26px; }
+  .pomodoro > div:first-child { min-width: 0; }
+  .pomodoro .clock-face { width: min(calc(100vw - 126px), calc(100dvh - 250px), 560px); }
+  .about { max-width: 680px; }
+  .about-mark { width: min(52vw, 300px); }
+}
+
+@media (max-width: 620px) {
+  .page-wrap:has(> .home) { padding-inline: 14px; }
+  .home { --home-circle-size: min(calc(100vw - 98px), calc(100dvh - 190px), 900px); }
+  .home-cta { width: min(390px, calc(100vw - 112px)); }
+  .timer-main { --timer-circle-size: min(calc(100vw - 98px), calc(100dvh - 200px), 520px); }
+  .timer-actions { width: min(100%, 420px); }
+  .pomodoro .clock-face { width: min(calc(100vw - 98px), calc(100dvh - 245px), 520px); }
+  .pomodoro-actions { width: 100%; }
+  .settings-grid { gap: 10px; }
+  .panel { padding: 18px; }
+  .setting { align-items: flex-start; flex-wrap: wrap; }
+  .slider { width: 100%; }
+  .about { gap: 20px; }
+  .about-mark { width: min(58vw, 250px); }
+  .feature-row { gap: 12px; }
+  .feature svg { width: 32px; }
+  .about-version { align-items: stretch; }
+  .about-version .button { width: 100%; }
+}
+
+@media (max-width: 460px) {
+  .app,
+  .app.sidebar-collapsed { --sidebar-width: 56px; grid-template-columns: 56px 1fr; }
+  .sidebar { padding-inline: 4px; }
+  .nav a { padding-inline: 10px; }
+  .home { --home-circle-size: min(calc(100vw - 76px), calc(100dvh - 180px), 900px); }
+  .home-cta { width: min(330px, calc(100vw - 80px)); font-size: 14px; padding-left: 14px; }
+  .timer-main { --timer-circle-size: min(calc(100vw - 76px), calc(100dvh - 190px), 500px); }
+  .pomodoro .clock-face { width: min(calc(100vw - 76px), calc(100dvh - 230px), 500px); }
+  .pomodoro-actions { gap: 8px; }
+  .pomodoro-actions .button { height: 50px; padding-inline: 14px; font-size: 15px; }
+  .tabs button { padding-inline: 5px; font-size: 12px; }
+  .shortcut-row { align-items: flex-start; flex-direction: column; gap: 7px; }
+  .page-wrap::after { left: calc(56px + (100vw - 56px) / 2); }
+  html.focus-mode .page-wrap::after { left: 50%; }
+}
