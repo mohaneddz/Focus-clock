@@ -59,6 +59,7 @@
   width: min(39vw, 64vh, 620px);
   min-width: 390px;
   flex: 0 0 auto;
+  transition: width 520ms cubic-bezier(.22, 1, .36, 1), transform 520ms cubic-bezier(.22, 1, .36, 1);
 }
 
 .home-clock-content {
@@ -67,11 +68,13 @@
   align-items: center;
   width: 82%;
   transform: translateY(3px);
+  transition: width 420ms ease, transform 420ms ease;
 }
 
 .home-clock-content .eyebrow {
   margin: 0 0 43px;
   line-height: 1;
+  transition: opacity 220ms ease, transform 300ms ease;
 }
 
 .home-clock-content .time {
@@ -83,6 +86,7 @@
   line-height: .72;
   letter-spacing: -.07em;
   white-space: nowrap;
+  transition: font-size 520ms cubic-bezier(.22, 1, .36, 1), transform 520ms cubic-bezier(.22, 1, .36, 1);
 }
 
 .home-clock-content .time-primary { display: block; }
@@ -101,6 +105,7 @@
   align-items: center;
   gap: 12px;
   margin-top: 50px;
+  transition: opacity 220ms ease, transform 300ms ease;
 }
 
 .home-date-stack .date {
@@ -115,6 +120,9 @@
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  max-height: 120px;
+  opacity: 1;
+  transition: opacity 240ms ease, transform 420ms cubic-bezier(.22, 1, .36, 1), max-height 420ms ease;
 }
 
 .home-cta {
@@ -124,6 +132,8 @@
   gap: 22px;
   padding: 8px 10px 8px 28px;
   transition: transform 200ms ease, border-color 200ms ease, background-color 200ms ease;
+  color: var(--text);
+  cursor: pointer;
 }
 
 .home-cta > span:nth-child(2) { flex: 1; text-align: center; }
@@ -143,6 +153,39 @@
   font: inherit;
 }
 
+.app,
+.sidebar,
+.page-wrap,
+.titlebar { transition: grid-template-columns 520ms cubic-bezier(.22, 1, .36, 1), opacity 360ms ease, transform 520ms cubic-bezier(.22, 1, .36, 1), padding 520ms cubic-bezier(.22, 1, .36, 1); }
+
+.sidebar { min-width: 0; overflow: hidden; }
+.focus-exit-hint {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 5;
+  color: #91b9d3;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 10px);
+  transition: opacity 300ms ease 180ms, transform 420ms cubic-bezier(.22, 1, .36, 1) 180ms;
+}
+.focus-exit-hint kbd { padding: 3px 7px; border: 1px solid #53798e; border-radius: 4px; background: #082333; }
+
+html.focus-mode .app { grid-template-columns: 0 1fr; }
+html.focus-mode .sidebar { width: 0; padding-left: 0; padding-right: 0; border-right-color: transparent; opacity: 0; transform: translateX(-100%); pointer-events: none; }
+html.focus-mode .page-wrap { padding: 30px; overflow: hidden; }
+html.focus-mode .home { justify-content: center; gap: 0; min-height: calc(100dvh - 60px); padding: 0; }
+html.focus-mode .home-clock { width: min(76vw, 86vh, 900px); min-width: 0; transform: translateY(-4px); }
+html.focus-mode .home-clock-content { width: 90%; transform: none; }
+html.focus-mode .home-clock-content .time { font-size: clamp(110px, 12vw, 190px); transform: translateX(-.04em); }
+html.focus-mode .home-clock-content .eyebrow,
+html.focus-mode .home-date-stack { position: absolute; opacity: 0; transform: translateY(8px); pointer-events: none; }
+html.focus-mode .home-actions { max-height: 0; opacity: 0; transform: translateY(18px); overflow: hidden; pointer-events: none; }
+html.focus-mode .focus-exit-hint { opacity: .75; transform: translate(-50%, 0); }
+html.focus-mode .titlebar { opacity: 0; pointer-events: none; }
+
 @media (max-height: 820px) {
   .home { gap: 20px; padding: 4px 0 8px; }
   .home-clock { width: min(37vw, 59vh, 540px); min-width: 350px; }
@@ -160,4 +203,8 @@
   .home-cta { min-width: min(390px, 86vw); font-size: 16px; padding-left: 20px; gap: 12px; }
   .titlebar { padding-right: 4px; }
   .titlebar-button { width: 38px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app,.sidebar,.page-wrap,.titlebar,.home-clock,.home-clock-content,.home-clock-content .time,.home-clock-content .eyebrow,.home-date-stack,.home-actions,.focus-exit-hint { transition-duration: .01ms !important; transition-delay: 0ms !important; }
 }
