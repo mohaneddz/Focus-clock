@@ -1,7 +1,7 @@
 import { createSignal, For, onMount } from "solid-js";
 import { disable, enable } from "@tauri-apps/plugin-autostart";
 import { getStoreValue, setStoreValue } from "@/config/store";
-import { loadSoundPrefs, playTick, setSoundVolume, setTickVariant, TickVariant, tickVariants } from "@/config/sounds";
+import { loadSoundPrefs, previewTick, setSoundVolume, setTickVariant, TickVariant, tickVariants } from "@/config/sounds";
 import { toast } from "@/config/toast";
 
 type Config = { pomodoroTimeSeconds: number; shortBreakTimeSeconds: number; longBreakTimeSeconds: number; numberOfRounds: number };
@@ -35,7 +35,7 @@ export default function Settings() {
 
   // Persist each change immediately so it takes effect without waiting for Save.
   const toggle = (key: string, set: (value: boolean) => void) => (value: boolean) => { set(value); void setStoreValue(key, value); };
-  const chooseTick = (variant: TickVariant) => { setTick(variant); setTickVariant(variant); void setStoreValue("tickSound", variant); playTick(variant); };
+  const chooseTick = (variant: TickVariant) => { setTick(variant); setTickVariant(variant); void setStoreValue("tickSound", variant); previewTick(variant); };
   const changeVolume = (value: number) => { setVolume(value); setSoundVolume(value); void setStoreValue("soundVolume", value); };
   const setField = (patch: Partial<Config>) => { const next = { ...config(), ...patch }; setConfig(next); void setStoreValue("pomodoro-settings", next); };
 

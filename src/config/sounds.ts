@@ -39,11 +39,12 @@ export const loadSoundPrefs = async () => {
 export const setSoundVolume = (percent: number) => { volume = Math.max(0, Math.min(100, percent)) / 100; };
 export const setTickVariant = (next: TickVariant) => { variant = next; };
 
-export const playTick = (override?: TickVariant) => {
+export const playTick = (override?: TickVariant, scale = 1) => {
   if (volume <= 0) return;
   try {
     const ctx = audio();
     const now = ctx.currentTime;
+    const level = volume * scale;
     const kind = override ?? variant;
     if (kind === "click") {
       const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.03), ctx.sampleRate);
@@ -55,7 +56,7 @@ export const playTick = (override?: TickVariant) => {
       highpass.type = "highpass";
       highpass.frequency.value = 2200;
       const gain = ctx.createGain();
-      gain.gain.value = 0.35 * volume;
+      gain.gain.value = 0.35 * level;
       source.connect(highpass).connect(gain).connect(ctx.destination);
       source.start();
       return;
@@ -66,19 +67,19 @@ export const playTick = (override?: TickVariant) => {
       oscillator.type = "triangle";
       oscillator.frequency.setValueAtTime(900, now);
       oscillator.frequency.exponentialRampToValueAtTime(480, now + 0.05);
-      gain.gain.setValueAtTime(0.06 * volume, now);
+      gain.gain.setValueAtTime(0.06 * level, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
       oscillator.stop(now + 0.07);
     } else if (kind === "pulse") {
       oscillator.type = "sine";
       oscillator.frequency.setValueAtTime(220, now);
-      gain.gain.setValueAtTime(0.07 * volume, now);
+      gain.gain.setValueAtTime(0.07 * level, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
       oscillator.stop(now + 0.1);
     } else {
       oscillator.type = "sine";
       oscillator.frequency.setValueAtTime(1050, now);
-      gain.gain.setValueAtTime(0.035 * volume, now);
+      gain.gain.setValueAtTime(0.035 * level, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
       oscillator.stop(now + 0.04);
     }
@@ -87,6 +88,11 @@ export const playTick = (override?: TickVariant) => {
   } catch {
     // Browsers can defer audio until the user has interacted with the page.
   }
+};
+
+/** Audibly preview a tick timbre: a few boosted ticks so the sound registers. */
+export const previewTick = (variant: TickVariant) => {
+  [0, 200, 400].forEach((delay) => setTimeout(() => playTick(variant, 2.6), delay));
 };
 
 export const playChime = (name: ChimeName) => {
