@@ -1,19 +1,13 @@
-import { For } from "solid-js";
+import { A } from "@solidjs/router";
+import { Clock3, House, Timer, TimerReset, Settings, CircleHelp } from "lucide-solid";
 
-interface NavigationProps {
-    onClick: () => void;
+const items = [
+  ["/", "Home", House], ["/timers", "Timers", Timer], ["/pomodoro", "Pomodoro", TimerReset],
+  ["/settings", "Settings", Settings], ["/about", "About", CircleHelp],
+] as const;
+
+export default function Navigation() {
+  return <aside class="sidebar"><div class="brand"><Clock3 size={31} /><span>Focus <span class="muted">Clock</span></span></div><nav class="nav" aria-label="Main navigation">
+    {items.map(([href, label, Icon]) => <A href={href} end={href === "/"} activeClass="active"><Icon size={27}/><span>{label}</span></A>)}
+  </nav></aside>;
 }
-
-export default function Navigation({ onClick }: NavigationProps) {
-    return (
-        <div class="fixed top-0 left-0 right-0 bottom-0 bg-primary-dark/90 backdrop-blur-sm z-50 center col" onClick={onClick}>
-            <For each={["Home", "Timer", "Pomodoro", "Settings"]} >
-                {(item) => (
-                    <a class="p-4 border-b border-primary-dark/50 text-5xl click" href={item === "Home" ? "/" : `/${item.toLowerCase()}`}>
-                        {item}
-                    </a>
-                )}
-            </For>
-        </div >
-    );
-};
