@@ -32,10 +32,11 @@ export default function Pomodoro() {
     return roundComplete;
   };
   const skipNext = () => {
-    if (mode() === "focus") choose(finishFocus() ? "long" : "short");
-    else { if (mode() === "long") setSessions(0); choose("focus"); }
+    if (mode() === "focus") { const roundComplete = finishFocus(); playChime(roundComplete ? "sessionsComplete" : "focusDone"); choose(roundComplete ? "long" : "short"); }
+    else { const wasLong = mode() === "long"; playChime(wasLong ? "longBreakDone" : "breakDone"); if (wasLong) setSessions(0); choose("focus"); }
   };
   const skipPrev = () => {
+    playChime(mode() === "focus" ? "focusDone" : mode() === "long" ? "longBreakDone" : "breakDone");
     if (mode() === "short") { setSessions((value) => Math.max(0, value - 1)); choose("focus"); return; }
     if (mode() === "long") { setLaps((value) => Math.max(0, value - 1)); setSessions(Math.max(0, rounds() - 1)); choose("focus"); return; }
     if (sessions() > 0) { choose(sessions() % rounds() === 0 ? "long" : "short"); return; }

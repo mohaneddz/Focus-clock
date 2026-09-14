@@ -1,14 +1,20 @@
 /* Refined home geometry and compact native window controls. */
 .titlebar {
-  height: 40px;
-  left: auto;
+  height: 42px;
+  left: var(--sidebar-width);
+  right: 0;
   width: auto;
-  padding: 4px 8px 0;
+  padding: 5px 8px 0;
   align-items: flex-start;
-  pointer-events: none;
-  background: transparent;
-  border: 0;
+  cursor: grab;
+  pointer-events: auto;
+  background: linear-gradient(90deg, #061d2cf2, #082a3af2 75%, #0a3142f7);
+  border-bottom: 1px solid #1a4d66;
+  box-shadow: 0 3px 12px #03131e88;
+  z-index: 20;
 }
+
+.titlebar:active { cursor: grabbing; }
 
 .window-controls {
   display: flex;
@@ -27,6 +33,18 @@
   color: #a9ccdf;
   transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
 }
+
+.page-wrap {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-color: #27728f #061c2a;
+  scrollbar-width: thin;
+}
+
+.page-wrap::-webkit-scrollbar { width: 12px; }
+.page-wrap::-webkit-scrollbar-track { background: #061c2a; border-left: 1px solid #16455c; }
+.page-wrap::-webkit-scrollbar-thumb { background: linear-gradient(#2f8eaf, #1b5c78); border: 3px solid #061c2a; border-radius: 999px; }
+.page-wrap::-webkit-scrollbar-thumb:hover { background: linear-gradient(#52c7e7, #267b9b); }
 
 .titlebar-button:hover {
   background: #103a4d;
@@ -395,4 +413,191 @@ html.focus-mode .home-clock-content .time { font-size: clamp(48px, 20cqi, 190px)
   .shortcut-row { align-items: flex-start; flex-direction: column; gap: 7px; }
   .page-wrap::after { left: calc(56px + (100vw - 56px) / 2); }
   html.focus-mode .page-wrap::after { left: 50%; }
+}
+
+/* Ambient depth: sparse, low-contrast points with deliberately slow motion. */
+.ambient-particles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ambient-particles i {
+  position: absolute;
+  left: var(--particle-x);
+  top: var(--particle-y);
+  width: var(--particle-size);
+  height: var(--particle-size);
+  border-radius: 50%;
+  background: #a9f3ff;
+  opacity: .18;
+  box-shadow: 0 0 7px #57ddffb8;
+  animation: particle-drift var(--particle-duration) ease-in-out var(--particle-delay) infinite alternate;
+}
+@keyframes particle-drift {
+  from { transform: translate3d(-4px, 7px, 0); opacity: .08; }
+  45% { opacity: .32; }
+  to { transform: translate3d(9px, -12px, 0); opacity: .12; }
+}
+
+/* About follows the supplied reference: a compact luminous dial paired with
+   a strong editorial column and calm, evenly spaced supporting UI. */
+.about {
+  width: min(100%, 1360px);
+  max-width: 1360px;
+  min-height: calc(100dvh - 102px);
+  margin: 0 auto;
+  padding: clamp(20px, 4.5vh, 58px) 0;
+  grid-template-columns: minmax(300px, .82fr) minmax(520px, 1.45fr);
+  gap: clamp(46px, 6vw, 100px);
+  align-items: center;
+}
+.about-mark {
+  position: relative;
+  isolation: isolate;
+  width: min(100%, 445px, 51vh);
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  justify-self: center;
+  overflow: hidden;
+  border: 2px solid #45dcff;
+  border-radius: 50%;
+  background:
+    url('/assets/focus-clock/04-clock-dial-overlay.png') center / 91% no-repeat,
+    radial-gradient(circle at 50% 48%, #0b3449 0%, #072334 54%, #041721 76%);
+  box-shadow: 0 0 34px #25cce73d, inset 0 0 46px #1684a83b;
+}
+.about-mark::before {
+  content: "";
+  position: absolute;
+  inset: 10%;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, #73eaff16 0 2%, transparent 3%), radial-gradient(circle at 65% 38%, #8ff5ff88 0 1px, transparent 2px);
+  background-size: 23px 23px, 37px 31px;
+  mask-image: radial-gradient(circle, #000 0 58%, transparent 78%);
+}
+.about-mark::after {
+  content: "";
+  position: absolute;
+  inset: 2.5%;
+  z-index: 0;
+  border: 3px solid transparent;
+  border-top-color: #b9f8ff;
+  border-right-color: #55dcff;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 8px #4ee2ff);
+  transform: rotate(-26deg);
+}
+.about-mark > svg {
+  position: relative;
+  z-index: 1;
+  width: 35%;
+  height: 35%;
+  color: #e8fbff;
+  stroke-width: 1.25;
+  filter: drop-shadow(0 0 12px #72eaff99);
+}
+.about-copy { min-width: 0; max-width: 780px; }
+.about-copy > .eyebrow { margin: 0 0 clamp(18px, 2.5vh, 28px); }
+.about h1 {
+  max-width: 780px;
+  margin: 0;
+  font-size: clamp(44px, 4.4vw, 68px);
+  line-height: 1.04;
+  letter-spacing: -.045em;
+  text-wrap: balance;
+}
+.about .subtitle {
+  max-width: 680px;
+  margin-top: clamp(18px, 2.7vh, 28px);
+  font-size: clamp(18px, 1.65vw, 25px);
+  line-height: 1.48;
+  text-wrap: balance;
+}
+.about .feature-row {
+  align-items: start;
+  gap: clamp(24px, 5vw, 76px);
+  margin: clamp(30px, 5vh, 50px) 0 clamp(28px, 4vh, 42px);
+}
+.about .feature { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; font-size: clamp(14px, 1.15vw, 18px); }
+.about .feature svg { display: block; width: clamp(48px, 4.4vw, 68px); height: auto; }
+.about .feature p { margin: 12px 0 0; }
+.about-version {
+  display: grid;
+  grid-template-columns: minmax(190px, 1fr) auto auto;
+  align-items: center;
+  gap: clamp(16px, 2vw, 28px);
+  width: 100%;
+  padding: 20px 24px;
+}
+.about-version > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding-right: 22px;
+  border-right: 1px solid #2b6079;
+}
+.about-version strong { font-size: 18px; }
+.about-version small { line-height: 1.35; }
+.about-version .button { min-height: 48px; margin-left: 0; padding: 0 21px; }
+.about-shortcuts {
+  margin: 16px 0 0;
+  padding: 17px 22px;
+  background: linear-gradient(145deg, #092c40b8, #072538a8);
+}
+.about-shortcuts h2 { margin-bottom: 12px; font-size: 18px; }
+.about-footer { margin: clamp(22px, 4vh, 38px) 0 0; font-size: 14px; line-height: 1.25; }
+
+/* Consistent fluid type outside of the clock faces. */
+.toolbar h1 { font-size: clamp(36px, 4vw, 52px); line-height: 1.04; text-wrap: balance; }
+.toolbar .subtitle { font-size: clamp(17px, 1.7vw, 22px); line-height: 1.4; }
+.panel h2 { font-size: clamp(20px, 2vw, 26px); line-height: 1.2; }
+
+@media (max-height: 780px) and (min-width: 901px) {
+  .about { padding-block: 12px; gap: clamp(34px, 4vw, 64px); }
+  .about-mark { width: min(100%, 390px, 50vh); }
+  .about-copy > .eyebrow { margin-bottom: 12px; }
+  .about h1 { font-size: clamp(39px, 3.8vw, 56px); }
+  .about .subtitle { margin-top: 12px; font-size: clamp(16px, 1.45vw, 21px); }
+  .about .feature-row { margin: 20px 0; }
+  .about-version { padding-block: 15px; }
+  .about-shortcuts { padding-block: 13px; }
+  .about-footer { margin-top: 16px; }
+}
+
+@media (max-width: 1100px) and (min-width: 901px) {
+  .about { grid-template-columns: minmax(270px, .72fr) minmax(470px, 1.3fr); gap: 38px; }
+  .about-mark { width: min(100%, 360px, 47vh); }
+  .about-version { grid-template-columns: minmax(160px, 1fr) auto auto; padding-inline: 18px; }
+  .about-version .button { padding-inline: 15px; }
+}
+
+@media (max-width: 900px) {
+  .about {
+    width: min(100%, 700px);
+    min-height: 0;
+    padding: 10px 0 30px;
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  .about-mark { width: min(72vw, 340px); }
+  .about-copy { max-width: none; }
+  .about-copy > .eyebrow,
+  .about h1,
+  .about .subtitle { text-align: center; margin-inline: auto; }
+}
+
+@media (max-width: 620px) {
+  .about h1 { font-size: clamp(35px, 10vw, 48px); }
+  .about .subtitle { font-size: 17px; }
+  .about .feature-row { gap: 12px; }
+  .about-version { grid-template-columns: 1fr; text-align: center; }
+  .about-version > div { padding: 0 0 15px; border-right: 0; border-bottom: 1px solid #2b6079; }
+  .about-shortcuts { padding: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-particles i { animation: none; }
 }
