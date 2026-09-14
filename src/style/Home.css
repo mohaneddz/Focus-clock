@@ -1,0 +1,197 @@
+/* Refined home geometry and compact native window controls. */
+.titlebar {
+  height: 40px;
+  padding: 4px 8px 0;
+  align-items: flex-start;
+  pointer-events: none;
+}
+
+.window-controls {
+  display: flex;
+  gap: 3px;
+  pointer-events: auto;
+}
+
+.titlebar-button {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 30px;
+  padding: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #a9ccdf;
+  transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
+}
+
+.titlebar-button:hover {
+  background: #103a4d;
+  color: #f3fbff;
+  box-shadow: inset 0 0 0 1px #2f668033;
+}
+
+.titlebar-button:active {
+  background: #174d63;
+  transform: translateY(1px);
+}
+
+.titlebar-button.close:hover {
+  background: #9d3043;
+  color: #fff;
+  box-shadow: none;
+}
+
+/* The scroll container begins after the titlebar, so the window controls
+   remain above it. The native scrollbar carries the app's blue-glass finish. */
+.titlebar {
+  z-index: 20;
+  background: linear-gradient(90deg, #061e2c 0%, #082b3f 72%, #0a344a 100%);
+  border-bottom: 1px solid #174b63;
+  box-shadow: 0 7px 20px #020d1538;
+}
+
+.page-wrap {
+  height: calc(100vh - 40px);
+  margin-top: 40px;
+  padding-top: 32px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  scrollbar-color: #3fc5e4 #061d2a;
+  scrollbar-width: thin;
+}
+
+.page-wrap::-webkit-scrollbar { width: 12px; }
+
+.page-wrap::-webkit-scrollbar-track {
+  background: #061d2a;
+  border-left: 1px solid #17475d;
+}
+
+.page-wrap::-webkit-scrollbar-thumb {
+  min-height: 48px;
+  border: 3px solid #061d2a;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #6ce6fb 0%, #249fc5 100%);
+  box-shadow: inset 0 0 0 1px #a4f4ff80, 0 0 8px #33cce05c;
+}
+
+.page-wrap::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #a0f4ff 0%, #36b9dc 100%);
+}
+
+.home {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+  min-height: calc(100dvh - 102px);
+  padding: 8px 0 20px;
+}
+
+.home-clock {
+  width: min(39vw, 64vh, 620px);
+  min-width: 390px;
+  flex: 0 0 auto;
+}
+
+.home-clock-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 82%;
+  transform: translateY(3px);
+}
+
+.home-clock-content .eyebrow {
+  margin: 0 0 43px;
+  line-height: 1;
+}
+
+.home-clock-content .time {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  width: 100%;
+  font-size: clamp(76px, 8.2vw, 142px);
+  line-height: .72;
+  letter-spacing: -.07em;
+  white-space: nowrap;
+}
+
+.home-clock-content .time-primary { display: block; }
+.home-clock-content .seconds {
+  display: block;
+  margin-left: .035em;
+  font-size: .46em;
+  letter-spacing: -.045em;
+  color: #83abc9;
+}
+
+.home-date-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 50px;
+}
+
+.home-date-stack .date {
+  margin: 0;
+  font-size: clamp(21px, 1.7vw, 28px);
+  line-height: 1.2;
+  letter-spacing: -.015em;
+}
+
+.home-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.home-cta {
+  min-width: 402px;
+  min-height: 72px;
+  justify-content: flex-start;
+  gap: 22px;
+  padding: 8px 10px 8px 28px;
+  transition: transform 200ms ease, border-color 200ms ease, background-color 200ms ease;
+}
+
+.home-cta > span:nth-child(2) { flex: 1; text-align: center; }
+.home-cta:hover { transform: translateY(-2px); border-color: #4bbddd; background: #0d3a52; }
+.home-cta .round-button { width: 54px; height: 54px; flex: 0 0 auto; }
+.home-hint { font-size: 15px; }
+.home-hint kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  margin: 0 4px;
+  border: 1px solid #52768b;
+  border-radius: 4px;
+  background: #092434;
+  color: #d8effc;
+  font: inherit;
+}
+
+@media (max-height: 820px) {
+  .home { gap: 20px; padding-bottom: 8px; }
+  .home-clock { width: min(37vw, 59vh, 540px); min-width: 350px; }
+  .home-clock-content .eyebrow { margin-bottom: 34px; }
+  .home-date-stack { margin-top: 40px; }
+  .home-actions { gap: 13px; }
+  .home-cta { min-height: 62px; }
+  .home-cta .round-button { width: 46px; height: 46px; }
+}
+
+@media (max-width: 620px) {
+  .home-clock { width: min(82vw, 58vh); min-width: 280px; }
+  .home-clock-content .eyebrow { margin-bottom: 28px; }
+  .home-date-stack { margin-top: 34px; }
+  .home-cta { min-width: min(390px, 86vw); font-size: 16px; padding-left: 20px; gap: 12px; }
+  .titlebar { padding-right: 4px; }
+  .titlebar-button { width: 38px; }
+}
