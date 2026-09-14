@@ -15,6 +15,9 @@
 		"core:window:allow-toggle-maximize",
 		"core:window:allow-internal-toggle-maximize",
 		"core:window:allow-set-fullscreen",
-		"store:default"
+		"core:window:allow-show",
+		"core:window:allow-hide",
+		"store:default",
+		"autostart:default"
 	]
 }
