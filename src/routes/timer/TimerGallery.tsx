@@ -1,102 +1,14 @@
-import Button from "@/components/core/Input/Button";
-
-import TimerCard from "@/components/TimerCard";
-import NewTimerCard from "@/components/NewTimerCard";
-
-import TextInput from "@/components/core/Input/TextInput";
-import TimeInput from "@/components/core/Input/TimeInput";
-
-import Modal from "@/components/Modal";
-import useTimer from "@/hooks/useTimer";
-
-import { For } from "solid-js";
-
-export default function TimerGallery() {
-
-  const { modalOpen, setModalOpen, newTimerModalOpen, setNewTimerModalOpen, editTimerModalOpen, setEditTimerModalOpen, newTimerTitle, setNewTimerTitle, newTimerDuration, setNewTimerDuration, editTimerTitle, setEditTimerTitle, editTimerDuration, setEditTimerDuration, timers, saveTimer, saveEditTimer, deleteTimer, openEditModal } = useTimer();
-
-  return (
-    <>
-      <Modal show={modalOpen()} onClose={() => setModalOpen(false)} />
-
-      <Modal show={newTimerModalOpen()} onClose={() => setNewTimerModalOpen(false)}>
-
-        <div class="flex flex-col gap-2 mt-2 w-60">
-
-          <h1 class="text-2xl font-bold mb-4">New Timer</h1>
-
-          <label for="timer-title">Title</label>
-          <TextInput id="timer-title" placeholder="Timer Title" class="mb-4 p-2 center border border-primary-light-3 rounded w-full" value={newTimerTitle()} onChange={setNewTimerTitle} />
-
-          <label for="timer-duration">Duration</label>
-          <TimeInput id="timer-duration" class="mb-4 p-2 border border-primary-light-3 rounded w-full" value={newTimerDuration()} onChange={setNewTimerDuration} />
-
-        </div>
-
-        <div class="grid grid-cols-2 w-full justify-stretch items-start gap-2 mt-8">
-          <Button
-            variant="basic"
-            class="w-full text-center"
-            onClick={() => setNewTimerModalOpen(false)}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            class="w-full text-center"
-            onClick={saveTimer}>
-            Save
-          </Button>
-        </div>
-
-      </Modal>
-
-      <Modal show={editTimerModalOpen()} onClose={() => setEditTimerModalOpen(false)}>
-
-        <div class="flex flex-col gap-2 mt-2 w-60">
-
-          <h1 class="text-2xl font-bold mb-4">Edit Timer</h1>
-
-          <label for="edit-timer-title">Title</label>
-          <TextInput id="edit-timer-title" placeholder="Timer Title" class="mb-4 p-2 center border border-primary-light-3 rounded w-full" value={editTimerTitle()} onChange={setEditTimerTitle} />
-
-          <label for="edit-timer-duration">Duration</label>
-          <TimeInput id="edit-timer-duration" class="mb-4 p-2 border border-primary-light-3 rounded w-full" value={editTimerDuration()} onChange={setEditTimerDuration} />
-
-        </div>
-
-        <div class="grid grid-cols-2 w-full justify-stretch items-start gap-2 mt-8">
-          <Button
-            variant="basic"
-            class="w-full text-center"
-            onClick={() => setEditTimerModalOpen(false)}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            class="w-full text-center"
-            onClick={saveEditTimer}>
-            Save
-          </Button>
-        </div>
-
-      </Modal>
-
-      <div class="full py-40 px-10 lg:px-20 overflow-y-scroll">
-
-        <section class="w-full flex content-center gap-8 flex-wrap">
-
-          <For each={timers()}>
-            {(timer) => <TimerCard id={timer?.id || 0} duration={timer?.duration || 0} title={timer?.title || ""} onEdit={() => openEditModal(timer)} onDelete={() => deleteTimer(timer.id)} />}
-          </For>
-
-          <NewTimerCard onClick={() => setNewTimerModalOpen(true)} />
-
-        </section>
-
-      </div>
-
-    </>
-  );
-};
+import { createSignal, For, Show, onMount } from "solid-js";
+import { A } from "@solidjs/router";
+import { Plus, Play, Pencil, Trash2, Search, X } from "lucide-solid";
+import { getStoreValue, setStoreValue } from "@/config/store";
+type TimerData = { id:number; title:string; duration:number; favorite?:boolean };
+const format = (s:number) => `${Math.floor(s/60).toString().padStart(2,"0")}:${(s%60).toString().padStart(2,"0")}`;
+export default function TimerGallery(){
+ const [timers,setTimers]=createSignal<TimerData[]>([]),[query,setQuery]=createSignal(""),[filter,setFilter]=createSignal("all"),[editing,setEditing]=createSignal<TimerData|null>(null),[title,setTitle]=createSignal(""),[minutes,setMinutes]=createSignal(25),[history,setHistory]=createSignal<{title:string;duration:number;at:string}[]>([]);
+ onMount(async()=>{setTimers((await getStoreValue<TimerData[]>("timers"))||[]);setHistory((await getStoreValue<any[]>("timer-history"))||[])});
+ const persist=(next:TimerData[])=>{setTimers(next);void setStoreValue("timers",next)};
+ const save=()=>{const item=editing()||{id:Date.now(),title:"",duration:0};persist(editing()?timers().map(t=>t.id===item.id?{...item,title:title().trim()||"Untitled timer",duration:minutes()*60}:t):[...timers(),{...item,title:title().trim()||"Untitled timer",duration:minutes()*60}]);setEditing(null)};
+ const visible=()=>timers().filter(t=>t.title.toLowerCase().includes(query().toLowerCase())&&(filter()!=="favorites"||t.favorite));
+ return <section class="page"><div class="toolbar"><div><h1>Timers</h1><p class="subtitle">Your saved countdowns</p></div><button class="button primary" onClick={()=>{setTitle("");setMinutes(25);setEditing({id:0,title:"",duration:0})}}><Plus/> New timer</button></div><div class="timer-controls"><label class="search"><Search size={20}/><input aria-label="Search timers" value={query()} onInput={e=>setQuery(e.currentTarget.value)} placeholder="Search timers"/></label><div class="chips"><button class={`chip ${filter()==="all"?"active":""}`} onClick={()=>setFilter("all")}>All</button><button class={`chip ${filter()==="favorites"?"active":""}`} onClick={()=>setFilter("favorites")}>Favorites</button></div></div><div class="timer-grid"><For each={visible()}>{t=><article class="timer-card"><button class="icon-button" aria-label="Favorite timer" onClick={()=>persist(timers().map(x=>x.id===t.id?{...x,favorite:!x.favorite}:x))}>☆</button><div class="mini-clock"><span>{format(t.duration)}</span></div><strong class="timer-name">{t.title}</strong><div class="card-actions"><button class="icon-button" aria-label="Edit" onClick={()=>{setEditing(t);setTitle(t.title);setMinutes(Math.max(1,Math.round(t.duration/60)))}}><Pencil/></button><A class="play-button" aria-label={`Start ${t.title}`} href={`/timer/${t.id}`}><Play fill="currentColor"/></A><button class="icon-button" aria-label="Delete" onClick={()=>persist(timers().filter(x=>x.id!==t.id))}><Trash2/></button></div></article>}</For><button class="timer-card new-card" onClick={()=>{setTitle("");setMinutes(25);setEditing({id:0,title:"",duration:0})}}><Plus size={54}/><span>Create timer</span></button></div><Show when={history().length}><section class="panel history"><h2>Recent activity</h2><For each={history().slice(0,4)}>{h=><div class="history-row"><Play size={16}/><div><strong>{h.title}</strong><small class="muted">Completed · {format(h.duration)}</small></div><time>{h.at}</time></div>}</For></section></Show><Show when={editing()}><div class="modal-backdrop" role="presentation"><form class="modal" onSubmit={e=>{e.preventDefault();save()}}><button class="icon-button" style={{float:"right"}} onClick={()=>setEditing(null)} aria-label="Close"><X/></button><h2>{editing()?.id?"Edit timer":"New timer"}</h2><label class="field">Timer name<input required value={title()} onInput={e=>setTitle(e.currentTarget.value)} placeholder="e.g. Deep work"/></label><label class="field">Minutes<input min="1" type="number" value={minutes()} onInput={e=>setMinutes(Math.max(1,Number(e.currentTarget.value)||1))}/></label><div class="modal-footer"><button class="button" type="button" onClick={()=>setEditing(null)}>Cancel</button><button class="button primary" type="submit">Save timer</button></div></form></div></Show></section>;
+}
