@@ -12,7 +12,7 @@ const Settings = lazy(() => import("@/routes/Settings"));
 const About = lazy(() => import("@/routes/About"));
 
 export default function App() {
-  return <Router root={(props) => <div class="app"><Navigation /><Titlebar /><main class="page-wrap"><Suspense fallback={<div class="page">Loading Focus Clock…</div>}>{props.children}</Suspense></main></div>}>
+  return <Router root={(props) => <div class="app"><img aria-hidden="true" src="/assets/focus-clock/05-sand-dust-overlay.png" style={{ position: "fixed", inset: "0", width: "100%", height: "100%", opacity: "0.035", "pointer-events": "none", "object-fit": "cover" }} /><Navigation /><Titlebar /><main class="page-wrap"><Suspense fallback={<div class="page">Loading Focus Clock…</div>}>{props.children}</Suspense></main></div>}>
     <Route path="/" component={Home} />
     <Route path="/timers" component={Timers} />
     <Route path="/timer" component={Timers} />
