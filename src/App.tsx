@@ -2,10 +2,13 @@ import { Router, Route } from "@solidjs/router";
 import { createEffect, createSignal, lazy, onCleanup, onMount, Suspense } from "solid-js";
 import Titlebar from "@/components/Titlebar";
 import Navigation from "@/components/Navigation";
+import AmbientParticles from "@/components/AmbientParticles";
+import Toaster from "@/components/Toaster";
 import "@/style/App.css";
 import "@/style/Home.css";
 import "@/style/Controls.css";
 import { focusMode, setFocusMode } from "@/config/focusMode";
+import { loadSoundPrefs } from "@/config/sounds";
 
 const Home = lazy(() => import("@/routes/Home"));
 const Timers = lazy(() => import("@/routes/timer/TimerGallery"));
@@ -20,6 +23,7 @@ export default function App() {
   createEffect(() => document.documentElement.classList.toggle("focus-mode", focusMode()));
 
   onMount(() => {
+    void loadSoundPrefs();
     const onKeyDown = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.code === "KeyS") {
         event.preventDefault();
@@ -43,9 +47,11 @@ export default function App() {
 
   return <Router root={(props) => <div class={`app ${sidebarCollapsed() ? "sidebar-collapsed" : ""}`}>
     <img aria-hidden="true" src="/assets/focus-clock/05-sand-dust-overlay.png" style={{ position: "fixed", inset: "0", width: "100%", height: "100%", opacity: "0.035", "pointer-events": "none", "object-fit": "cover" }} />
+    <AmbientParticles />
     <Navigation collapsed={sidebarCollapsed()} />
     <Titlebar />
     <main class="page-wrap"><Suspense fallback={<div class="page">Loading Focus Clock…</div>}>{props.children}</Suspense></main>
+    <Toaster />
   </div>}>
     <Route path="/" component={Home} />
     <Route path="/timers" component={Timers} />
