@@ -3,6 +3,7 @@ import { A, useParams } from "@solidjs/router";
 import { Pause, Play, RotateCcw, Volume2, VolumeX } from "lucide-solid";
 import { getStoreValue, setStoreValue } from "@/config/store";
 import useTickingSound from "@/hooks/useTickingSound";
+import ClockRing from "@/components/ClockRing";
 
 type TimerData = { id: number; title: string; duration: number };
 const fmt = (seconds: number) => `${Math.floor(seconds / 60).toString().padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`;
@@ -58,6 +59,7 @@ export default function TimerMain() {
 
   return <section class="page timer-main">
     <div class="clock-face">
+      <ClockRing progress={(timer()?.duration || 0) ? left() / (timer()!.duration) : 0} />
       <div class="clock-content">
         <p class="eyebrow">Countdown</p>
         <div class="time timer-time" aria-label={fmt(left())}>
