@@ -4,6 +4,7 @@ import Titlebar from "@/components/Titlebar";
 import Navigation from "@/components/Navigation";
 import "@/style/App.css";
 import "@/style/Home.css";
+import "@/style/Controls.css";
 
 const Home = lazy(() => import("@/routes/Home"));
 const Timers = lazy(() => import("@/routes/timer/TimerGallery"));
