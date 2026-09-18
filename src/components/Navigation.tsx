@@ -7,7 +7,8 @@ const items = [
 ] as const;
 
 export default function Navigation(props: { collapsed?: boolean; onToggle: () => void }) {
-  return <aside class="sidebar" aria-label="Sidebar" aria-expanded={!props.collapsed}><button type="button" class="brand" aria-label={props.collapsed ? "Expand sidebar" : "Collapse sidebar"} aria-expanded={!props.collapsed} title={props.collapsed ? "Expand sidebar" : "Collapse sidebar"} onClick={props.onToggle}><Clock3 size={31} /><span class="brand-label">Focus <span class="muted">Clock</span></span></button><nav class="nav" aria-label="Main navigation">
+  const toggle = (event: MouseEvent) => { event.preventDefault(); props.onToggle(); };
+  return <aside class="sidebar" aria-label="Sidebar" aria-expanded={!props.collapsed}><button type="button" class="brand" aria-label={props.collapsed ? "Expand sidebar" : "Collapse sidebar"} aria-expanded={!props.collapsed} title={props.collapsed ? "Expand sidebar" : "Collapse sidebar"} onClick={toggle}><Clock3 size={31} /><span class="brand-label">Focus <span class="muted">Clock</span></span></button><nav class="nav" aria-label="Main navigation">
     {items.map(([href, label, Icon]) => <A href={href} end={href === "/"} activeClass="active"><Icon size={27}/><span>{label}</span></A>)}
   </nav></aside>;
 }
