@@ -1,5 +1,5 @@
 import { createSignal, For, onMount } from "solid-js";
-import { disable, enable } from "@tauri-apps/plugin-autostart";
+import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
 import { getStoreValue, setStoreValue } from "@/config/store";
 import { loadSoundPrefs, previewTick, setSoundVolume, setTickVariant, TickVariant, tickVariants } from "@/config/sounds";
 import { toast } from "@/config/toast";
@@ -11,6 +11,7 @@ const Step = (props: { value: number; set: (value: number) => void; min?: number
 
 export default function Settings() {
   const [close, setClose] = createSignal(false);
+  const [launchAtStartup, setLaunchAtStartup] = createSignal(false);
   const [minimized, setMinimized] = createSignal(false);
   const [particles, setParticles] = createSignal(true);
   const [notify, setNotify] = createSignal(true);
@@ -21,6 +22,8 @@ export default function Settings() {
   const [config, setConfig] = createSignal(defaults);
 
   onMount(async () => {
+    try { setLaunchAtStartup(await isEnabled()); }
+    catch { toast("Startup status could not be read", "error"); }
     setClose((await getStoreValue<boolean>("closeToTray")) ?? false);
     setMinimized((await getStoreValue<boolean>("startMinimized")) ?? false);
     setParticles((await getStoreValue<boolean>("ambientParticles")) ?? true);
@@ -38,6 +41,12 @@ export default function Settings() {
   const chooseTick = (variant: TickVariant) => { setTick(variant); setTickVariant(variant); void setStoreValue("tickSound", variant); previewTick(variant); };
   const changeVolume = (value: number) => { setVolume(value); setSoundVolume(value); void setStoreValue("soundVolume", value); };
   const setField = (patch: Partial<Config>) => { const next = { ...config(), ...patch }; setConfig(next); void setStoreValue("pomodoro-settings", next); };
+  const toggleLaunchAtStartup = async (value: boolean) => {
+    try {
+      if (value) await enable(); else await disable();
+      setLaunchAtStartup(await isEnabled());
+    } catch { toast("Could not update launch at startup", "error"); }
+  };
 
   const save = async () => {
     await Promise.all([
@@ -59,7 +68,7 @@ export default function Settings() {
     <div class="toolbar"><div><h1>Settings</h1><p class="subtitle">Make Focus Clock work your way</p></div></div>
     <div class="settings-grid">
       <section class="panel"><h2>General</h2>
-        <div class="setting"><div class="copy"><strong>Launch at startup</strong><small>Start Focus Clock when Windows starts</small></div><Toggle on={false} set={(value) => value ? enable() : disable()} /></div>
+        <div class="setting"><div class="copy"><strong>Launch at startup</strong><small>Start Focus Clock when Windows starts</small></div><Toggle on={launchAtStartup()} set={toggleLaunchAtStartup} /></div>
         <div class="setting"><div class="copy"><strong>Minimize to tray</strong><small>Keep running in the background</small></div><Toggle on={close()} set={toggle("closeToTray", setClose)} /></div>
         <div class="setting"><div class="copy"><strong>Start minimized</strong><small>Launch directly to system tray</small></div><Toggle on={minimized()} set={toggle("startMinimized", setMinimized)} /></div>
       </section>
