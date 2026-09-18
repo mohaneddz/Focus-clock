@@ -1,5 +1,5 @@
 import { createSignal, onCleanup, onMount } from "solid-js";
-import { ArrowRight, Crosshair, Volume2, VolumeX } from "lucide-solid";
+import { Volume2, VolumeX } from "lucide-solid";
 import useTickingSound from "@/hooks/useTickingSound";
 import { focusMode, setFocusMode } from "@/config/focusMode";
 
@@ -29,6 +29,5 @@ export default function Home() {
         <button class="clock-sound-toggle" type="button" aria-label={muted() ? "Unmute clock ticking" : "Mute clock ticking"} aria-pressed={muted()} onClick={toggleMuted}>{muted() ? <VolumeX /> : <Volume2 />}</button>
       </div>
     </div>
-    <div class="home-actions"><button type="button" class="home-cta" aria-pressed={focusMode()} onClick={() => setFocusMode(true)}><Crosshair size={25}/><span>Start a focus session</span><span class="round-button"><ArrowRight/></span></button></div>
   </section>;
 }
