@@ -191,7 +191,7 @@
 .app.sidebar-collapsed { --sidebar-width: 70px; grid-template-columns: 70px 1fr; }
 .app.sidebar-collapsed .sidebar { padding-inline: 7px; }
 .app.sidebar-collapsed .brand { justify-content: center; padding: 0; }
-.app.sidebar-collapsed .brand > span,
+.app.sidebar-collapsed .brand-label,
 .app.sidebar-collapsed .nav a > span { opacity: 0; width: 0; overflow: hidden; }
 .app.sidebar-collapsed .nav a { justify-content: center; padding-inline: 16px; }
 
