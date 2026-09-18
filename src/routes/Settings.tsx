@@ -36,7 +36,7 @@ export default function Settings() {
     await loadSoundPrefs();
   });
 
-  // Persist each change immediately so it takes effect without waiting for Save.
+  // Persist each change immediately so it takes effect without a save action.
   const toggle = (key: string, set: (value: boolean) => void) => (value: boolean) => { set(value); void setStoreValue(key, value); };
   const chooseTick = (variant: TickVariant) => { setTick(variant); setTickVariant(variant); void setStoreValue("tickSound", variant); previewTick(variant); };
   const changeVolume = (value: number) => { setVolume(value); setSoundVolume(value); void setStoreValue("soundVolume", value); };
@@ -48,16 +48,6 @@ export default function Settings() {
     } catch { toast("Could not update launch at startup", "error"); }
   };
 
-  const save = async () => {
-    await Promise.all([
-      setStoreValue("closeToTray", close()), setStoreValue("startMinimized", minimized()),
-      setStoreValue("ambientParticles", particles()), setStoreValue("notifications", notify()),
-      setStoreValue("reminders", remind()), setStoreValue("tickingSound", ticking()),
-      setStoreValue("tickSound", tick()), setStoreValue("soundVolume", volume()),
-      setStoreValue("pomodoro-settings", config()),
-    ]);
-    toast("Settings saved");
-  };
   const reset = () => {
     setConfig(defaults);
     void setStoreValue("pomodoro-settings", defaults);
@@ -88,8 +78,8 @@ export default function Settings() {
         <div class="setting"><div class="copy"><strong>Short break</strong><small>Default short break length</small></div><Step value={config().shortBreakTimeSeconds / 60} unit=" min" set={(value) => setField({ shortBreakTimeSeconds: value * 60 })} /></div>
         <div class="setting"><div class="copy"><strong>Long break</strong><small>Default long break length</small></div><Step value={config().longBreakTimeSeconds / 60} unit=" min" set={(value) => setField({ longBreakTimeSeconds: value * 60 })} /></div>
         <div class="setting"><div class="copy"><strong>Sessions</strong><small>Default number of sessions</small></div><Step value={config().numberOfRounds} set={(value) => setField({ numberOfRounds: value })} /></div>
+        <div class="setting"><div class="copy"><strong>Reset defaults</strong><small>Restore all timer lengths and sessions</small></div><button class="button" type="button" onClick={reset}>Reset defaults</button></div>
       </section>
     </div>
-    <div class="settings-footer"><button class="button" onClick={reset}>Reset defaults</button><button class="button primary" onClick={() => void save()}>Save changes</button></div>
   </section>;
 }
