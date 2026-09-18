@@ -3,7 +3,7 @@ import { CircleHelp, Clock3, Github, RefreshCw, Timer, TimerReset } from "lucide
 const shortcuts = [
   ["P", "Toggle focus mode"],
   ["Ctrl", "+", "S", "Collapse or expand sidebar"],
-  ["F11", "Toggle fullscreen"],
+  ["F11", "Maximize or restore window"],
   ["Esc", "Exit focus mode"],
 ] as const;
 
