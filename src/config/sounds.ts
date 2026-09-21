@@ -75,7 +75,7 @@ export const playTick = (override?: TickVariant, scale = 1) => {
     } else if (kind === "pulse") {
       oscillator.type = "sine";
       oscillator.frequency.setValueAtTime(220, now);
-      gain.gain.setValueAtTime(0.07 * level, now);
+      gain.gain.setValueAtTime(0.14 * level, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
       oscillator.stop(now + 0.1);
     } else {
