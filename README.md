@@ -144,5 +144,5 @@ src-tauri/            # Tauri backend (Rust) — minimal, store + serde only
 
 ## Current Status
 
-Alpha (`0.1.0`). Phase 1 is complete and working; Phase 2 items above haven't been started. There's
+Version `2.1.0`. Phase 1 is complete and working; Phase 2 items above haven't been started. There's
 a leftover, unused `src/temp/settings.tsx` from an earlier settings rewrite that never got wired in.
