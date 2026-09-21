@@ -1,13 +1,21 @@
-import { CircleHelp, Clock3, Github, RefreshCw, Timer, TimerReset } from "lucide-solid";
+import { createSignal, For } from "solid-js";
+import { CircleHelp, Clock3, Github, Timer, TimerReset } from "lucide-solid";
+import Modal from "@/components/Modal";
 
 const shortcuts = [
-  ["P", "Toggle focus mode"],
-  ["Ctrl", "+", "S", "Collapse or expand sidebar"],
-  ["F11", "Maximize or restore window"],
-  ["Esc", "Exit focus mode"],
+  { keys: ["P"], label: "Toggle focus mode" },
+  { keys: ["Ctrl", "+", "S"], label: "Collapse or expand sidebar" },
+  { keys: ["F11"], label: "Maximize or restore window" },
+  { keys: ["Esc"], label: "Exit focus mode" },
+  { keys: ["Right Alt", "+", "P"], label: "Play or pause the current timer or Pomodoro" },
+  { keys: ["Right Alt", "+", "O"], label: "Stop the current timer or Pomodoro" },
+  { keys: ["Right Alt", "+", "L"], label: "Reset the countdown or Pomodoro cycle" },
+  { keys: ["Right Alt", "+", "> / <"], label: "Change Pomodoro phase or saved timer" },
 ] as const;
 
 export default function About() {
+  const [shortcutsOpen, setShortcutsOpen] = createSignal(false);
+
   return <section class="page about">
     <div class="about-mark"><Clock3 size={155} stroke-width={1.4} /></div>
     <div class="about-copy">
@@ -22,18 +30,20 @@ export default function About() {
       <div class="panel about-version">
         <div><strong>Version 1.0.0</strong><small class="muted">Built with Tauri + SolidJS</small></div>
         <a class="button" href="https://github.com" target="_blank" rel="noreferrer"><Github size={18} /> View source</a>
-        <button class="button" type="button"><RefreshCw size={18} /> Check for updates</button>
+        <button class="button" type="button" onClick={() => setShortcutsOpen(true)}><CircleHelp size={18} /> Keyboard shortcuts</button>
       </div>
-      <section class="panel about-shortcuts" aria-labelledby="shortcuts-title">
-        <h2 id="shortcuts-title"><CircleHelp size={21} /> Shortcuts</h2>
-        <div class="shortcut-list">
-          {shortcuts.map((shortcut) => <div class="shortcut-row">
-            <span class="shortcut-keys">{shortcut.slice(0, -1).map((key) => key === "+" ? <span class="key-join">+</span> : <kbd>{key}</kbd>)}</span>
-            <span>{shortcut[shortcut.length - 1]}</span>
-          </div>)}
-        </div>
-      </section>
       <p class="muted about-footer">Privacy　 |　 Licenses　 |　 Report an issue<br /><br />Designed for deep focus.</p>
     </div>
+    <Modal show={shortcutsOpen()} onClose={() => setShortcutsOpen(false)}>
+      <section class="about-shortcuts shortcut-modal" aria-labelledby="shortcuts-title">
+        <h2 id="shortcuts-title"><CircleHelp size={21} /> Keyboard shortcuts</h2>
+        <div class="shortcut-list">
+          <For each={shortcuts}>{shortcut => <div class="shortcut-row">
+            <span class="shortcut-keys">{shortcut.keys.map((key) => key === "+" ? <span class="key-join">+</span> : <kbd>{key}</kbd>)}</span>
+            <span>{shortcut.label}</span>
+          </div>}</For>
+        </div>
+      </section>
+    </Modal>
   </section>;
 }
