@@ -1,4 +1,6 @@
 use std::fs;
+#[cfg(windows)]
+mod shortcuts;
 
 use tauri::menu::{Menu, MenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
@@ -95,6 +97,8 @@ pub fn run() {
         ))
         .invoke_handler(tauri::generate_handler![greet])
         .setup(|app| {
+            #[cfg(windows)]
+            shortcuts::install(app.handle().clone())?;
             build_tray(app)?;
 
             let settings = read_app_settings(&app.handle());
