@@ -1,5 +1,6 @@
 import { createSignal, onMount, For } from "solid-js";
 import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw, Square, Volume2, VolumeX } from "lucide-solid";
+import { selectSession } from "@/config/sessionControls";
 import { getStoreValue } from "@/config/store";
 import { playChime } from "@/config/sounds";
 import useTickingSound from "@/hooks/useTickingSound";
@@ -26,8 +27,9 @@ export default function Pomodoro() {
 
   const duration = () => mode() === "focus" ? config().pomodoroTimeSeconds : mode() === "short" ? config().shortBreakTimeSeconds : config().longBreakTimeSeconds;
   const choose = (nextMode: "focus" | "short" | "long") => {
-    clearInterval(tick); setRunning(false); setMode(nextMode);
-    setLeft(nextMode === "focus" ? config().pomodoroTimeSeconds : nextMode === "short" ? config().shortBreakTimeSeconds : config().longBreakTimeSeconds);
+    setMode(nextMode);
+    setLeft(duration());
+    if (running()) end = Date.now() + left() * 1000;
   };
   const rounds = () => config().numberOfRounds;
   const finishFocus = () => {
@@ -48,30 +50,35 @@ export default function Pomodoro() {
     if (laps() > 0) { setSessions(rounds()); choose("long"); }
   };
   const stop = () => { clearInterval(tick); setRunning(false); setLeft(duration()); };
-  const reset = () => { setLaps(0); setSessions(0); choose("focus"); };
+  const reset = () => { stop(); setLaps(0); setSessions(0); choose("focus"); };
   const update = () => {
-    const next = Math.max(0, Math.ceil((end - Date.now()) / 1000));
-    setLeft(next);
-    if (next) return;
-    clearInterval(tick); setRunning(false);
-    if (mode() === "focus") {
-      const roundComplete = finishFocus();
-      playChime(roundComplete ? "sessionsComplete" : "focusDone");
-      choose(roundComplete ? "long" : "short");
-    } else {
-      const wasLong = mode() === "long";
-      playChime(wasLong ? "longBreakDone" : "breakDone");
-      if (wasLong) setSessions(0);
-      choose("focus");
+    if (!running()) return;
+    const now = Date.now();
+    // Carry elapsed time across phase boundaries, including after sleep or throttling.
+    while (now >= end) {
+      const boundary = end;
+      skipNext();
+      end = boundary + duration() * 1000;
     }
+    setLeft(Math.max(0, Math.ceil((end - now) / 1000)));
   };
   onMount(async () => {
     const stored = (await getStoreValue<Config>("pomodoro-settings")) || defaults;
-    setConfig(stored);
-    if (!settingsLoaded) { setLeft(stored.pomodoroTimeSeconds); settingsLoaded = true; }
+    setConfig({
+      pomodoroTimeSeconds: Math.max(1, stored.pomodoroTimeSeconds || defaults.pomodoroTimeSeconds),
+      shortBreakTimeSeconds: Math.max(1, stored.shortBreakTimeSeconds || defaults.shortBreakTimeSeconds),
+      longBreakTimeSeconds: Math.max(1, stored.longBreakTimeSeconds || defaults.longBreakTimeSeconds),
+      numberOfRounds: Math.max(1, Math.floor(stored.numberOfRounds || defaults.numberOfRounds)),
+    });
+    if (!settingsLoaded) { setLeft(config().pomodoroTimeSeconds); settingsLoaded = true; }
+    selectSession("pomodoro", { "play-pause": toggle, stop, reset, next: skipNext, previous: skipPrev, pause });
   });
+  const pause = () => {
+    if (running()) update();
+    clearInterval(tick); setRunning(false);
+  };
   const toggle = () => {
-    if (running()) { clearInterval(tick); setRunning(false); }
+    if (running()) pause();
     else { end = Date.now() + left() * 1000; tick = window.setInterval(update, 250); setRunning(true); }
   };
   const label = () => mode() === "focus" ? "Focus session" : mode() === "short" ? "Short break" : "Long break";
@@ -80,5 +87,5 @@ export default function Pomodoro() {
     <div class="tabs"><button class={mode() === "focus" ? "active" : ""} onClick={() => choose("focus")}>Focus<br />{config().pomodoroTimeSeconds / 60}</button><button class={mode() === "short" ? "active" : ""} onClick={() => choose("short")}>Short break<br />{config().shortBreakTimeSeconds / 60}</button><button class={mode() === "long" ? "active" : ""} onClick={() => choose("long")}>Long break<br />{config().longBreakTimeSeconds / 60}</button></div>
     <div class="clock-face"><ClockRing progress={duration() ? left() / duration() : 0} /><div class="clock-content"><p class="eyebrow">{label()}</p><div class="time">{fmt(left())}</div><p class="date">{mode() === "focus" ? "Stay with one task" : "Take a breath"}</p></div><button class="clock-sound-toggle" type="button" aria-label={muted() ? "Unmute clock ticking" : "Mute clock ticking"} aria-pressed={muted()} onClick={toggleMuted}>{muted() ? <VolumeX /> : <Volume2 />}</button></div>
     <div class="pomodoro-actions"><button class="button primary" onClick={toggle}>{running() ? <Pause /> : <Play fill="currentColor" />}{running() ? "Pause" : "Start"}</button><button class="button" onClick={reset}><RotateCcw />Reset</button></div>
-  </div><aside class="panel today">{laps() > 0 && <span class="lap-badge">{laps()} {laps() === 1 ? "lap" : "laps"}</span>}<h2>Today</h2><div class="session-count">{sessions()} <span class="muted">/ {config().numberOfRounds} <small>sessions</small></span></div><div class="dots"><For each={Array.from({ length: config().numberOfRounds })}>{(_, index) => <i class={index() < sessions() ? "done" : ""} />}</For></div><hr class="section-rule" /><span class="muted">Focus time</span><h2>{Math.round((laps() * rounds() + sessions()) * config().pomodoroTimeSeconds / 60)} min</h2><hr class="section-rule" /><span class="muted">Phase controls</span><div class="phase-controls"><button class="button" aria-label="Previous phase" onClick={skipPrev}><ChevronLeft /></button><button class="button" aria-label="Stop" onClick={stop}><Square /></button><button class="button" aria-label="Next phase" onClick={skipNext}><ChevronRight /></button></div></aside></section>;
+  </div><aside class="panel today">{laps() > 0 && <span class="lap-badge">{laps()} {laps() === 1 ? "lap" : "laps"}</span>}<h2>Today</h2><div class="session-count">{sessions()} <span class="muted">/ {config().numberOfRounds} <small>sessions</small></span></div><div class="dots"><For each={Array.from({ length: config().numberOfRounds })}>{(_, index) => <i class={index() < sessions() ? "done" : ""} />}</For></div><hr class="section-rule" /><span class="muted">Focus time</span><h2>{Math.round(((laps() - (mode() === "long" ? 1 : 0)) * rounds() + sessions()) * config().pomodoroTimeSeconds / 60)} min</h2><hr class="section-rule" /><span class="muted">Phase controls</span><div class="phase-controls"><button class="button" aria-label="Previous phase" onClick={skipPrev}><ChevronLeft /></button><button class="button" aria-label="Stop" onClick={stop}><Square /></button><button class="button" aria-label="Next phase" onClick={skipNext}><ChevronRight /></button></div></aside></section>;
 }

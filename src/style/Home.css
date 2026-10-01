@@ -168,7 +168,7 @@
 }
 
 .home-cta {
-  min-width: 402px;
+  width: min(402px, calc(100vw - var(--sidebar-width) - 64px));
   min-height: 72px;
   justify-content: flex-start;
   gap: 22px;
@@ -412,6 +412,21 @@ html.focus-mode .home-clock-content .time { font-size: clamp(48px, 20cqi, 190px)
   .tabs button { padding-inline: 5px; font-size: 12px; }
   .shortcut-row { align-items: flex-start; flex-direction: column; gap: 7px; }
   .page-wrap::after { left: calc(56px + (100vw - 56px) / 2); }
+  html.focus-mode .page-wrap::after { left: 50%; }
+}
+
+@media (max-width: 380px) {
+  .app,
+  .app.sidebar-collapsed { --sidebar-width: 44px; grid-template-columns: 44px 1fr; }
+  .sidebar { padding-inline: 2px; }
+  .nav a { padding-inline: 6px; }
+  .home { --home-circle-size: min(calc(100vw - 56px), calc(100dvh - 170px), 900px); }
+  .home-cta { width: min(280px, calc(100vw - 60px)); font-size: 13px; padding-left: 10px; gap: 8px; }
+  .home-cta .round-button { width: 40px; height: 40px; }
+  .timer-main { --timer-circle-size: min(calc(100vw - 56px), calc(100dvh - 180px), 420px); }
+  .pomodoro .clock-face { width: min(calc(100vw - 56px), calc(100dvh - 210px), 420px); }
+  .tabs button { padding-inline: 3px; font-size: 11px; }
+  .page-wrap::after { left: calc(44px + (100vw - 44px) / 2); }
   html.focus-mode .page-wrap::after { left: 50%; }
 }
 

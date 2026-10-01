@@ -9,6 +9,7 @@ import "@/style/Home.css";
 import "@/style/Controls.css";
 import { focusMode, setFocusMode } from "@/config/focusMode";
 import { loadSoundPrefs } from "@/config/sounds";
+import { listenForSessionShortcuts } from "@/config/sessionControls";
 
 const Home = lazy(() => import("@/routes/Home"));
 const Timers = lazy(() => import("@/routes/timer/TimerGallery"));
@@ -23,6 +24,14 @@ export default function App() {
   createEffect(() => document.documentElement.classList.toggle("focus-mode", focusMode()));
 
   onMount(() => {
+    let disposed = false;
+    let unlisten: (() => void) | undefined;
+    if ("__TAURI_INTERNALS__" in window) {
+      void listenForSessionShortcuts().then((cleanup) => {
+        if (disposed) cleanup(); else unlisten = cleanup;
+      }).catch(console.error);
+    }
+    onCleanup(() => { disposed = true; unlisten?.(); });
     void loadSoundPrefs();
     const onKeyDown = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.code === "KeyS") {

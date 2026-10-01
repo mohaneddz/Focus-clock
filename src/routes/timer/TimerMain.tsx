@@ -1,8 +1,9 @@
-import { createSignal, onMount } from "solid-js";
-import { A, useParams } from "@solidjs/router";
-import { Pause, Play, RotateCcw, Volume2, VolumeX } from "lucide-solid";
+import { createSignal, createEffect } from "solid-js";
+import { A, useParams, useNavigate } from "@solidjs/router";
+import { Pause, Play, RotateCcw, Square, Volume2, VolumeX } from "lucide-solid";
 import { getStoreValue, setStoreValue } from "@/config/store";
 import useTickingSound from "@/hooks/useTickingSound";
+import { selectSession } from "@/config/sessionControls";
 import ClockRing from "@/components/ClockRing";
 
 type TimerData = { id: number; title: string; duration: number };
@@ -18,7 +19,9 @@ let end = 0;
 let tick: number | undefined;
 
 export default function TimerMain() {
-  const id = Number(useParams().id);
+  const params = useParams();
+  const navigate = useNavigate();
+  let loadVersion = 0;
   const [timer, setTimer] = createSignal<TimerData | null>(null);
   const { muted, toggleMuted } = useTickingSound(left, running);
 
@@ -38,8 +41,10 @@ export default function TimerMain() {
     }
   };
 
-  onMount(async () => {
+  const loadTimer = async (id: number) => {
+    const version = ++loadVersion;
     const found = ((await getStoreValue<TimerData[]>("timers")) || []).find((item) => item.id === id);
+    if (version !== loadVersion) return;
     setTimer(found || null);
     if (activeTimerId !== id) {
       activeTimerId = id;
@@ -47,13 +52,32 @@ export default function TimerMain() {
       setRunning(false);
       setLeft(found?.duration || 0);
     }
-  });
+    if (found) selectSession("timer", { "play-pause": toggle, stop: reset, reset, next: () => adjacent(1), previous: () => adjacent(-1), pause });
+  };
+  createEffect(() => { void loadTimer(Number(params.id)); });
 
+  const adjacent = async (direction: number) => {
+    const timers = (await getStoreValue<TimerData[]>("timers")) || [];
+    if (!timers.length) return;
+    const index = timers.findIndex(item => item.id === activeTimerId);
+    const next = timers[(index + direction + timers.length) % timers.length];
+    const resume = running();
+    pause();
+    await loadTimer(next.id);
+    if (resume) toggle();
+    // Selecting a different preset should also show which timer is now controlled.
+    navigate(`/timer/${next.id}`);
+  };
+  const pause = () => {
+    if (running()) update();
+    clearInterval(tick);
+    setRunning(false);
+  };
   const toggle = () => {
     if (running()) {
-      clearInterval(tick);
-      setRunning(false);
-    } else if (left() > 0) {
+      pause();
+    } else if (timer()) {
+      if (left() <= 0) setLeft(timer()!.duration);
       end = Date.now() + left() * 1000;
       tick = window.setInterval(update, 250);
       setRunning(true);
@@ -81,6 +105,7 @@ export default function TimerMain() {
     <div class="timer-actions">
       <div class="pomodoro-actions">
         <button class="button primary" onClick={toggle}>{running() ? <Pause /> : <Play fill="currentColor" />}{running() ? "Pause" : "Start"}</button>
+        <button class="button" onClick={reset}><Square />Stop</button>
         <button class="button" onClick={reset}><RotateCcw />Reset</button>
       </div>
       <A class="muted" href="/timers">Back to timers</A>
