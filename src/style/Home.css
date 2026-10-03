@@ -446,14 +446,14 @@ html.focus-mode .home-clock-content .time { font-size: clamp(48px, 20cqi, 190px)
   height: var(--particle-size);
   border-radius: 50%;
   background: #a9f3ff;
-  opacity: .18;
-  box-shadow: 0 0 7px #57ddffb8;
+  opacity: .28;
+  box-shadow: 0 0 9px #57ddffcc, 0 0 15px #57ddff55;
   animation: particle-drift var(--particle-duration) ease-in-out var(--particle-delay) infinite alternate;
 }
 @keyframes particle-drift {
-  from { transform: translate3d(-4px, 7px, 0); opacity: .08; }
-  45% { opacity: .32; }
-  to { transform: translate3d(9px, -12px, 0); opacity: .12; }
+  from { transform: translate3d(-4px, 7px, 0); opacity: .22; }
+  45% { opacity: .55; }
+  to { transform: translate3d(9px, -12px, 0); opacity: .28; }
 }
 
 /* About follows the supplied reference: a compact luminous dial paired with

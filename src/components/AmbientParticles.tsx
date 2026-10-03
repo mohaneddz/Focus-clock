@@ -1,10 +1,10 @@
 import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { getStoreValue } from "@/config/store";
 
-const particles = Array.from({ length: 30 }, (_, index) => ({
+const particles = Array.from({ length: 38 }, (_, index) => ({
   x: (index * 37 + 11) % 100,
   y: (index * 61 + 7) % 100,
-  size: 1 + (index % 3) * 0.65,
+  size: 1.5 + (index % 3) * 0.75,
   delay: -(index % 10) * 1.7,
   duration: 13 + (index % 7) * 2.3,
 }));
