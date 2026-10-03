@@ -7,6 +7,7 @@ import Toaster from "@/components/Toaster";
 import "@/style/App.css";
 import "@/style/Home.css";
 import "@/style/Controls.css";
+import "@/style/Navigation.css";
 import { focusMode, setFocusMode } from "@/config/focusMode";
 import { loadSoundPrefs } from "@/config/sounds";
 import { listenForSessionShortcuts } from "@/config/sessionControls";
@@ -20,10 +21,20 @@ const About = lazy(() => import("@/routes/About"));
 
 export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = createSignal(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = createSignal(false);
+
+  const toggleNavigation = () => {
+    if (window.matchMedia("(max-width: 620px)").matches) setMobileMenuOpen((open) => !open);
+    else setSidebarCollapsed((collapsed) => !collapsed);
+  };
 
   createEffect(() => document.documentElement.classList.toggle("focus-mode", focusMode()));
 
   onMount(() => {
+    const compactLayout = window.matchMedia("(max-width: 620px)");
+    const closeOnResize = () => setMobileMenuOpen(false);
+    compactLayout.addEventListener("change", closeOnResize);
+    onCleanup(() => compactLayout.removeEventListener("change", closeOnResize));
     let disposed = false;
     let unlisten: (() => void) | undefined;
     if ("__TAURI_INTERNALS__" in window) {
@@ -36,16 +47,20 @@ export default function App() {
     const onKeyDown = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.code === "KeyS") {
         event.preventDefault();
-        setSidebarCollapsed((collapsed) => !collapsed);
+        toggleNavigation();
       }
       if (event.code === "KeyP" && !event.repeat && !event.ctrlKey && !event.metaKey && !event.altKey) {
         const target = event.target as HTMLElement | null;
         if (!target?.matches("input, textarea, select, [contenteditable='true']")) {
           event.preventDefault();
+          setMobileMenuOpen(false);
           setFocusMode((active) => !active);
         }
       }
-      if (event.key === "Escape" && focusMode()) {
+      if (event.key === "Escape" && mobileMenuOpen()) {
+        event.preventDefault();
+        setMobileMenuOpen(false);
+      } else if (event.key === "Escape" && focusMode()) {
         event.preventDefault();
         setFocusMode(false);
       }
@@ -54,11 +69,11 @@ export default function App() {
     onCleanup(() => { window.removeEventListener("keydown", onKeyDown); document.documentElement.classList.remove("focus-mode"); });
   });
 
-  return <Router root={(props) => <div class={`app ${sidebarCollapsed() ? "sidebar-collapsed" : ""}`}>
+  return <Router root={(props) => <div class={`app ${sidebarCollapsed() ? "sidebar-collapsed" : ""} ${mobileMenuOpen() ? "mobile-menu-open" : ""}`}>
     <img aria-hidden="true" src="/assets/focus-clock/05-sand-dust-overlay.png" style={{ position: "fixed", inset: "0", width: "100%", height: "100%", opacity: "0.035", "pointer-events": "none", "object-fit": "cover" }} />
     <AmbientParticles />
-    <Navigation collapsed={sidebarCollapsed()} onToggle={() => setSidebarCollapsed((collapsed) => !collapsed)} />
-    <Titlebar />
+    <Navigation collapsed={sidebarCollapsed()} mobileOpen={mobileMenuOpen()} onToggle={toggleNavigation} onClose={() => setMobileMenuOpen(false)} />
+    <Titlebar mobileMenuOpen={mobileMenuOpen()} onMenuToggle={toggleNavigation} />
     <main class="page-wrap"><Suspense fallback={<div class="page">Loading Focus Clock…</div>}>{props.children}</Suspense></main>
     <Toaster />
   </div>}>

@@ -3,7 +3,7 @@ import { getCurrentWindow, currentMonitor, LogicalPosition, LogicalSize } from "
 import { Maximize2, Minimize2, Minus, X } from "lucide-solid";
 import { toast } from "@/config/toast";
 
-export default function Titlebar() {
+export default function Titlebar(props: { mobileMenuOpen?: boolean; onMenuToggle?: () => void }) {
   const windowApi = (window as Window & { __TAURI_INTERNALS__?: unknown }).__TAURI_INTERNALS__ ? getCurrentWindow() : null;
   const [maximized, setMaximized] = createSignal(false);
   const [isFullscreen, setIsFullscreen] = createSignal(false);
@@ -76,6 +76,9 @@ export default function Titlebar() {
   };
 
   return <header class="titlebar" onMouseDown={startDragging}>
+    <button type="button" class={`mobile-menu-toggle ${props.mobileMenuOpen ? "is-open" : ""}`} aria-label={props.mobileMenuOpen ? "Close menu" : "Open menu"} aria-controls="main-navigation" aria-expanded={!!props.mobileMenuOpen} onClick={props.onMenuToggle}>
+      <span class="menu-icon" aria-hidden="true"><span /><span /><span /></span>
+    </button>
     <div class="window-controls">
       <button aria-label="Minimize" class="titlebar-button" onClick={() => void windowApi?.minimize()}><Minus size={16}/></button>
       <button aria-label={maximized() ? "Restore window" : "Maximize"} class="titlebar-button" title="Maximize window (F11 toggles fullscreen)" onClick={() => void toggleMaximize()}>
