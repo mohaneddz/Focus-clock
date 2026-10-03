@@ -16,7 +16,7 @@
   html.native-fullscreen .titlebar { display: flex; background: transparent; border: 0; box-shadow: none; }
   html.native-fullscreen .titlebar .window-controls { display: none; }
   html.focus-mode .mobile-menu-toggle { visibility: hidden; pointer-events: none; }
-  .page-wrap::after { left: 50%; transform: translateX(-50%); }
+  .page-wrap::after { left: 50%; transform: translate(-50%, -50%); }
 
   .mobile-menu-toggle {
     position: absolute;
