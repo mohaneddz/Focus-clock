@@ -28,7 +28,7 @@ export default function About() {
         <div class="feature"><TimerReset size={42} /><p>Pomodoro</p></div>
       </div>
       <div class="panel about-version">
-        <div><strong>Version 2.1.0</strong><small class="muted">Built with Tauri + SolidJS</small></div>
+        <div><strong>Version 2.1.1</strong><small class="muted">Built with Tauri + SolidJS</small></div>
         <a class="button" href="https://github.com" target="_blank" rel="noreferrer"><Github size={18} /> View source</a>
         <button class="button" type="button" onClick={() => setShortcutsOpen(true)}><CircleHelp size={18} /> Keyboard shortcuts</button>
       </div>
