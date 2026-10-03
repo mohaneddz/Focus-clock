@@ -134,3 +134,7 @@
   .sidebar .nav a,
   .app.sidebar-collapsed .nav a { padding-block: 11px; }
 }
+
+@media (max-width: 620px) and (max-aspect-ratio: 3/5) {
+  .home-clock .clock-sound-toggle { bottom: calc(-1 * clamp(44px, 8dvh, 86px)); }
+}
