@@ -562,6 +562,7 @@ html.focus-mode .home-clock-content .time { font-size: clamp(48px, 20cqi, 190px)
   padding: 17px 22px;
   background: linear-gradient(145deg, #092c40b8, #072538a8);
 }
+.about-shortcuts.shortcut-modal { margin: 0; padding: 0; background: transparent; }
 .about-shortcuts h2 { margin-bottom: 12px; font-size: 18px; }
 .about-footer { margin: clamp(22px, 4vh, 38px) 0 0; font-size: 14px; line-height: 1.25; }
 
