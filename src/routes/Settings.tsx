@@ -74,9 +74,11 @@ export default function Settings() {
         <div class="setting"><div class="copy"><strong>Leading zero on hour</strong><small>Pad single-digit hours (09:05 instead of 9:05)</small></div><Toggle on={padHour()} set={setPadHour} /></div>
         <div class="setting"><div class="copy"><strong>Date display</strong><small>Choose how the date reads, or hide it</small></div><div class="chips"><For each={dateStyles}>{(option) => <button class={`chip ${dateStyle() === option.id ? "active" : ""}`} onClick={() => setDateStyle(option.id)}>{option.label}</button>}</For></div></div>
       </section>
-      <section class="panel"><h2>Notifications & sound</h2>
+      <section class="panel"><h2>Notifications</h2>
         <div class="setting"><div class="copy"><strong>Timer complete</strong><small>Show a notification when a timer ends</small></div><Toggle on={notify()} set={toggle("notifications", setNotify)} /></div>
         <div class="setting"><div class="copy"><strong>Session reminders</strong><small>Gentle reminders to keep you on track</small></div><Toggle on={remind()} set={toggle("reminders", setRemind)} /></div>
+      </section>
+      <section class="panel"><h2>Sound</h2>
         <div class="setting"><div class="copy"><strong>Ticking sound</strong><small>Use this as the default for every clock</small></div><Toggle on={ticking()} set={toggle("tickingSound", setTicking)} /></div>
         <div class="setting"><div class="copy"><strong>Ticking style</strong><small>Choose how each second sounds</small></div><div class="chips"><For each={tickVariants}>{(option) => <button class={`chip ${tick() === option.id ? "active" : ""}`} onClick={() => chooseTick(option.id)}>{option.label}</button>}</For></div></div>
         <div class="setting"><div class="copy"><strong>Sound volume</strong><small>Adjust notification volume</small></div><input class="slider" type="range" value={volume()} onInput={(event) => changeVolume(Number(event.currentTarget.value))} /></div>
