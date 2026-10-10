@@ -135,6 +135,16 @@
   color: #83abc9;
   transform: translateY(.16em);
 }
+.home-clock-content .day-period {
+  display: block;
+  align-self: flex-start;
+  margin-left: .12em;
+  margin-top: .32em;
+  font-size: .26em;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: #83abc9;
+}
 
 .home-date-stack {
   display: flex;

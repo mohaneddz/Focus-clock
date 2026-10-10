@@ -10,6 +10,7 @@ import "@/style/Controls.css";
 import "@/style/Navigation.css";
 import { focusMode, setFocusMode } from "@/config/focusMode";
 import { loadSoundPrefs } from "@/config/sounds";
+import { loadClockSettings } from "@/config/clockSettings";
 import { listenForSessionShortcuts } from "@/config/sessionControls";
 
 const Home = lazy(() => import("@/routes/Home"));
@@ -44,6 +45,7 @@ export default function App() {
     }
     onCleanup(() => { disposed = true; unlisten?.(); });
     void loadSoundPrefs();
+    void loadClockSettings();
     const onKeyDown = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.code === "KeyS") {
         event.preventDefault();

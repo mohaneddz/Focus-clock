@@ -2,6 +2,7 @@ import { createSignal, For, onMount } from "solid-js";
 import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
 import { getStoreValue, setStoreValue } from "@/config/store";
 import { loadSoundPrefs, previewTick, setSoundVolume, setTickVariant, TickVariant, tickVariants } from "@/config/sounds";
+import { dateStyle, dateStyles, hourFormat, hourFormats, loadClockSettings, padHour, setDateStyle, setHourFormat, setPadHour, setShowSeconds, showSeconds } from "@/config/clockSettings";
 import { toast } from "@/config/toast";
 
 type Config = { pomodoroTimeSeconds: number; shortBreakTimeSeconds: number; longBreakTimeSeconds: number; numberOfRounds: number };
@@ -34,6 +35,7 @@ export default function Settings() {
     setVolume((await getStoreValue<number>("soundVolume")) ?? 70);
     setConfig((await getStoreValue<Config>("pomodoro-settings")) || defaults);
     await loadSoundPrefs();
+    await loadClockSettings();
   });
 
   // Persist each change immediately so it takes effect without a save action.
@@ -65,6 +67,12 @@ export default function Settings() {
       <section class="panel"><h2>Appearance</h2>
         <div class="setting"><div class="copy"><strong>Ambient texture</strong><small>Show restrained visual texture</small></div><Toggle on={particles()} set={(value) => { setParticles(value); void setStoreValue("ambientParticles", value); window.dispatchEvent(new CustomEvent("ambient-particles-change", { detail: value })); }} /></div>
         <div class="setting"><div class="copy"><strong>Background intensity</strong><small>Adjust background visibility</small></div><input class="slider" type="range" /></div>
+      </section>
+      <section class="panel"><h2>Clock</h2>
+        <div class="setting"><div class="copy"><strong>Time format</strong><small>Show the hour in 24-hour or 12-hour time</small></div><div class="chips"><For each={hourFormats}>{(option) => <button class={`chip ${hourFormat() === option.id ? "active" : ""}`} onClick={() => setHourFormat(option.id)}>{option.label}</button>}</For></div></div>
+        <div class="setting"><div class="copy"><strong>Show seconds</strong><small>Display the seconds beside the time</small></div><Toggle on={showSeconds()} set={setShowSeconds} /></div>
+        <div class="setting"><div class="copy"><strong>Leading zero on hour</strong><small>Pad single-digit hours (09:05 instead of 9:05)</small></div><Toggle on={padHour()} set={setPadHour} /></div>
+        <div class="setting"><div class="copy"><strong>Date display</strong><small>Choose how the date reads, or hide it</small></div><div class="chips"><For each={dateStyles}>{(option) => <button class={`chip ${dateStyle() === option.id ? "active" : ""}`} onClick={() => setDateStyle(option.id)}>{option.label}</button>}</For></div></div>
       </section>
       <section class="panel"><h2>Notifications & sound</h2>
         <div class="setting"><div class="copy"><strong>Timer complete</strong><small>Show a notification when a timer ends</small></div><Toggle on={notify()} set={toggle("notifications", setNotify)} /></div>
