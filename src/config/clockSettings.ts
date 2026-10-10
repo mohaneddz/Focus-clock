@@ -55,6 +55,16 @@ export const formatSeconds = (date: Date) => String(date.getSeconds()).padStart(
 
 export const dayPeriod = (date: Date) => hourFormat() === "12" ? (date.getHours() < 12 ? "AM" : "PM") : "";
 
+export const timeZoneLabel = (date: Date) => {
+  try {
+    const named = new Intl.DateTimeFormat([], { timeZoneName: "long" })
+      .formatToParts(date)
+      .find((part) => part.type === "timeZoneName")?.value;
+    if (named) return named;
+  } catch { /* fall through to IANA name */ }
+  return Intl.DateTimeFormat().resolvedOptions().timeZone.replace(/_/g, " ");
+};
+
 export const formatDate = (date: Date) => {
   switch (dateStyle()) {
     case "off": return "";

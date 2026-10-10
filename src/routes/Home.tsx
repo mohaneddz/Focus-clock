@@ -2,7 +2,7 @@ import { createSignal, onCleanup, onMount, Show } from "solid-js";
 import { Volume2, VolumeX } from "lucide-solid";
 import useTickingSound from "@/hooks/useTickingSound";
 import { focusMode, setFocusMode } from "@/config/focusMode";
-import { dayPeriod, formatDate, formatSeconds, formatTime, showSeconds } from "@/config/clockSettings";
+import { dayPeriod, formatDate, formatSeconds, formatTime, showSeconds, timeZoneLabel } from "@/config/clockSettings";
 
 export default function Home() {
   const [now, setNow] = createSignal(new Date());
@@ -19,6 +19,7 @@ export default function Home() {
   const seconds = () => formatSeconds(now());
   const period = () => dayPeriod(now());
   const date = () => formatDate(now());
+  const zone = () => timeZoneLabel(now());
   return <section class="page home">
     <div class="home-clock-stage">
       <div class="clock-face home-clock">
@@ -29,7 +30,7 @@ export default function Home() {
             <Show when={showSeconds()}><span class="seconds">:{seconds()}</span></Show>
             <Show when={period()}><span class="day-period">{period()}</span></Show>
           </div>
-          <Show when={date()}><div class="home-date-stack"><p class="date">{date()}</p><span class="muted">Local timezone</span></div></Show>
+          <Show when={date()}><div class="home-date-stack"><p class="date">{date()}</p><span class="muted">{zone()}</span></div></Show>
         </div>
         <button class="clock-sound-toggle clock-focus-toggle" type="button" aria-label={focusMode() ? "Exit focus mode" : "Enter focus mode"} aria-pressed={focusMode()} aria-keyshortcuts="P" title="Toggle focus mode (P)" onClick={() => setFocusMode((active) => !active)}>P</button>
         <button class="clock-sound-toggle" type="button" aria-label={muted() ? "Unmute clock ticking" : "Mute clock ticking"} aria-pressed={muted()} onClick={toggleMuted}>{muted() ? <VolumeX /> : <Volume2 />}</button>
