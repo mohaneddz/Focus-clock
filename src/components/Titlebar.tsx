@@ -1,5 +1,5 @@
 import { createSignal, onCleanup, onMount } from "solid-js";
-import { getCurrentWindow } from "@tauri-apps/api/window";
+import { currentMonitor, getCurrentWindow, PhysicalPosition, PhysicalSize } from "@tauri-apps/api/window";
 import { Maximize2, Minimize2, Minus, X } from "lucide-solid";
 import { toast } from "@/config/toast";
 
@@ -7,18 +7,45 @@ export default function Titlebar(props: { mobileMenuOpen?: boolean; onMenuToggle
   const windowApi = (window as Window & { __TAURI_INTERNALS__?: unknown }).__TAURI_INTERNALS__ ? getCurrentWindow() : null;
   const [maximized, setMaximized] = createSignal(false);
   const [isFullscreen, setIsFullscreen] = createSignal(false);
-  const syncWindowState = async () => {
+  // The window is borderless (decorations: false), where tao's native fullscreen
+  // is unreliable on Windows. Instead we do borderless fullscreen manually:
+  // cover the whole monitor and sit always-on-top so the taskbar is hidden too.
+  let saved: { position: PhysicalPosition; size: PhysicalSize; wasMaximized: boolean } | null = null;
+
+  const syncMaximized = async () => { if (windowApi && !isFullscreen()) setMaximized(await windowApi.isMaximized()); };
+
+  const enterFullscreen = async () => {
     if (!windowApi) return;
-    const [isMaximized, isFullscreen] = await Promise.all([windowApi.isMaximized(), windowApi.isFullscreen()]);
-    setMaximized(isMaximized);
-    setIsFullscreen(isFullscreen);
-    document.documentElement.classList.toggle("native-fullscreen", isFullscreen);
+    const monitor = await currentMonitor();
+    if (!monitor) throw new Error("No monitor information available");
+    saved = { position: await windowApi.outerPosition(), size: await windowApi.outerSize(), wasMaximized: await windowApi.isMaximized() };
+    await windowApi.setAlwaysOnTop(true);
+    await windowApi.setPosition(new PhysicalPosition(monitor.position.x, monitor.position.y));
+    await windowApi.setSize(new PhysicalSize(monitor.size.width, monitor.size.height));
+    setIsFullscreen(true);
+    document.documentElement.classList.add("native-fullscreen");
+  };
+
+  const exitFullscreen = async () => {
+    if (!windowApi) return;
+    await windowApi.setAlwaysOnTop(false);
+    if (saved?.wasMaximized) {
+      await windowApi.setPosition(saved.position);
+      await windowApi.maximize();
+    } else if (saved) {
+      await windowApi.setPosition(saved.position);
+      await windowApi.setSize(saved.size);
+    }
+    saved = null;
+    setIsFullscreen(false);
+    document.documentElement.classList.remove("native-fullscreen");
+    await syncMaximized();
   };
 
   onMount(() => {
     let disposed = false;
     let changingFullscreen = false;
-    void syncWindowState();
+    void syncMaximized();
 
     const onKey = async (event: KeyboardEvent) => {
       if (event.key !== "F11" || !windowApi) return;
@@ -26,8 +53,7 @@ export default function Titlebar(props: { mobileMenuOpen?: boolean; onMenuToggle
       if (event.repeat || changingFullscreen) return;
       changingFullscreen = true;
       try {
-        await windowApi.setFullscreen(!isFullscreen());
-        await syncWindowState();
+        if (isFullscreen()) await exitFullscreen(); else await enterFullscreen();
       } catch (error) {
         console.error(error);
         toast("Could not change fullscreen", "error");
@@ -36,7 +62,7 @@ export default function Titlebar(props: { mobileMenuOpen?: boolean; onMenuToggle
     window.addEventListener("keydown", onKey);
     let unlistenResize: (() => void) | undefined;
     void windowApi?.onResized(() => {
-      void syncWindowState();
+      void syncMaximized();
     }).then((unlisten) => { if (disposed) unlisten(); else unlistenResize = unlisten; });
     onCleanup(() => { disposed = true; window.removeEventListener("keydown", onKey); unlistenResize?.(); document.documentElement.classList.remove("native-fullscreen"); setIsFullscreen(false); });
   });
@@ -47,7 +73,7 @@ export default function Titlebar(props: { mobileMenuOpen?: boolean; onMenuToggle
   };
   const toggleMaximize = async () => {
     await windowApi?.toggleMaximize();
-    await syncWindowState();
+    await syncMaximized();
   };
 
   return <header class="titlebar" onMouseDown={startDragging}>

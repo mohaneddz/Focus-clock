@@ -9,9 +9,10 @@ import { dispatchSessionAction as action } from "../src/config/sessionControls";
 
 const mocks = vi.hoisted(() => ({
   data: {} as Record<string, unknown>,
-  fullscreen: false,
-  setFullscreen: vi.fn(async (_value: boolean) => {}),
-  maximize: vi.fn(),
+  setAlwaysOnTop: vi.fn(async (_value: boolean) => {}),
+  setPosition: vi.fn(async () => {}),
+  setSize: vi.fn(async () => {}),
+  maximize: vi.fn(async () => {}),
 }));
 vi.mock("@/config/store", () => ({
   getStoreValue: vi.fn(async (key: string) => mocks.data[key] ?? null),
@@ -19,13 +20,22 @@ vi.mock("@/config/store", () => ({
 }));
 vi.mock("@/config/sounds", () => ({ playChime: vi.fn() }));
 vi.mock("@/hooks/useTickingSound", () => ({ default: () => ({ muted: () => true, toggleMuted: () => {} }) }));
-vi.mock("@tauri-apps/api/window", () => ({ getCurrentWindow: () => ({
-  isMaximized: async () => false,
-  isFullscreen: async () => mocks.fullscreen,
-  setFullscreen: mocks.setFullscreen,
-  toggleMaximize: mocks.maximize,
-  onResized: async () => () => {},
-}) }));
+vi.mock("@tauri-apps/api/window", () => ({
+  getCurrentWindow: () => ({
+    isMaximized: async () => false,
+    outerPosition: async () => ({ x: 0, y: 0 }),
+    outerSize: async () => ({ width: 800, height: 600 }),
+    setAlwaysOnTop: mocks.setAlwaysOnTop,
+    setPosition: mocks.setPosition,
+    setSize: mocks.setSize,
+    maximize: mocks.maximize,
+    toggleMaximize: vi.fn(),
+    onResized: async () => () => {},
+  }),
+  currentMonitor: async () => ({ position: { x: 0, y: 0 }, size: { width: 1920, height: 1080 } }),
+  PhysicalPosition: class { constructor(public x: number, public y: number) {} },
+  PhysicalSize: class { constructor(public width: number, public height: number) {} },
+}));
 
 let dispose: (() => void) | undefined;
 const settle = async () => { for (let i = 0; i < 12; i++) await Promise.resolve(); };
@@ -131,22 +141,23 @@ describe("countdown shortcuts", () => {
   });
 });
 
-describe("native fullscreen", () => {
-  it("F11 enters and exits fullscreen without maximizing; ignores held-key repeat", async () => {
+describe("borderless fullscreen", () => {
+  it("F11 covers the monitor always-on-top and restores on exit; ignores held-key repeat", async () => {
     (window as any).__TAURI_INTERNALS__ = {};
-    mocks.fullscreen = false;
-    mocks.setFullscreen.mockImplementation(async value => { mocks.fullscreen = value; });
-    dispose = render(Titlebar, document.body);
+    dispose = render(() => <Titlebar />, document.body);
+    await settle();
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "F11", cancelable: true }));
     await settle();
-    expect(mocks.fullscreen).toBe(true);
+    expect(mocks.setAlwaysOnTop).toHaveBeenLastCalledWith(true);
+    expect(mocks.setSize).toHaveBeenLastCalledWith(expect.objectContaining({ width: 1920, height: 1080 }));
     expect(document.documentElement.classList.contains("native-fullscreen")).toBe(true);
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "F11", repeat: true }));
     await settle();
-    expect(mocks.fullscreen).toBe(true);
+    expect(document.documentElement.classList.contains("native-fullscreen")).toBe(true);
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "F11" }));
     await settle();
-    expect(mocks.fullscreen).toBe(false);
+    expect(mocks.setAlwaysOnTop).toHaveBeenLastCalledWith(false);
+    expect(document.documentElement.classList.contains("native-fullscreen")).toBe(false);
     expect(mocks.maximize).not.toHaveBeenCalled();
   });
 });

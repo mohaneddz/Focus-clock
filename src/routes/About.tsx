@@ -5,7 +5,7 @@ import Modal from "@/components/Modal";
 const shortcuts = [
   { keys: ["P"], label: "Toggle focus mode" },
   { keys: ["Ctrl", "+", "S"], label: "Collapse or expand sidebar" },
-  { keys: ["F11"], label: "Maximize or restore window" },
+  { keys: ["F11"], label: "Toggle fullscreen" },
   { keys: ["Esc"], label: "Exit focus mode" },
   { keys: ["Right Alt", "+", "P"], label: "Play or pause the current timer or Pomodoro" },
   { keys: ["Right Alt", "+", "O"], label: "Stop the current timer or Pomodoro" },
