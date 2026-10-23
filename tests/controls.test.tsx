@@ -10,6 +10,8 @@ import { dispatchSessionAction as action } from "../src/config/sessionControls";
 const mocks = vi.hoisted(() => ({
   data: {} as Record<string, unknown>,
   setAlwaysOnTop: vi.fn(async (_value: boolean) => {}),
+  setShadow: vi.fn(async (_value: boolean) => {}),
+  setResizable: vi.fn(async (_value: boolean) => {}),
   setPosition: vi.fn(async () => {}),
   setSize: vi.fn(async () => {}),
   maximize: vi.fn(async () => {}),
@@ -25,7 +27,10 @@ vi.mock("@tauri-apps/api/window", () => ({
     isMaximized: async () => false,
     outerPosition: async () => ({ x: 0, y: 0 }),
     outerSize: async () => ({ width: 800, height: 600 }),
+    isResizable: async () => true,
     setAlwaysOnTop: mocks.setAlwaysOnTop,
+    setShadow: mocks.setShadow,
+    setResizable: mocks.setResizable,
     setPosition: mocks.setPosition,
     setSize: mocks.setSize,
     maximize: mocks.maximize,
@@ -149,6 +154,7 @@ describe("borderless fullscreen", () => {
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "F11", cancelable: true }));
     await settle();
     expect(mocks.setAlwaysOnTop).toHaveBeenLastCalledWith(true);
+    expect(mocks.setShadow).toHaveBeenLastCalledWith(false);
     expect(mocks.setSize).toHaveBeenLastCalledWith(expect.objectContaining({ width: 1920, height: 1080 }));
     expect(document.documentElement.classList.contains("native-fullscreen")).toBe(true);
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "F11", repeat: true }));
@@ -157,6 +163,7 @@ describe("borderless fullscreen", () => {
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "F11" }));
     await settle();
     expect(mocks.setAlwaysOnTop).toHaveBeenLastCalledWith(false);
+    expect(mocks.setShadow).toHaveBeenLastCalledWith(true);
     expect(document.documentElement.classList.contains("native-fullscreen")).toBe(false);
     expect(mocks.maximize).not.toHaveBeenCalled();
   });

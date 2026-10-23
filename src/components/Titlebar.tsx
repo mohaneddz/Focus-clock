@@ -19,6 +19,7 @@ export default function Titlebar(props: { mobileMenuOpen?: boolean; onMenuToggle
     const monitor = await currentMonitor();
     if (!monitor) throw new Error("No monitor information available");
     saved = { position: await windowApi.outerPosition(), size: await windowApi.outerSize(), wasMaximized: await windowApi.isMaximized(), resizable: await windowApi.isResizable() };
+    await windowApi.setShadow(false);
     await windowApi.setResizable(false);
     await windowApi.setAlwaysOnTop(true);
     await windowApi.setPosition(new PhysicalPosition(monitor.position.x, monitor.position.y));
@@ -30,6 +31,7 @@ export default function Titlebar(props: { mobileMenuOpen?: boolean; onMenuToggle
   const exitFullscreen = async () => {
     if (!windowApi) return;
     await windowApi.setAlwaysOnTop(false);
+    await windowApi.setShadow(true);
     await windowApi.setResizable(saved?.resizable ?? true);
     if (saved?.wasMaximized) {
       await windowApi.setPosition(saved.position);
