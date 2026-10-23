@@ -226,9 +226,9 @@
 .about-footer { margin-top: 35px; text-align: center; }
 
 html.native-fullscreen .titlebar { display: none; }
-html.native-fullscreen .app { --sidebar-width: 0px; grid-template-columns: 0 minmax(0, 1fr); }
-html.native-fullscreen .sidebar { width: 0; min-width: 0; padding-inline: 0; border: 0; opacity: 0; pointer-events: none; }
-html.native-fullscreen .page-wrap { height: 100vh; margin-top: 0; padding-top: 32px; }
+html.native-fullscreen .app { --sidebar-width: 0px; width: 100vw; grid-template-columns: minmax(0, 1fr); }
+html.native-fullscreen .sidebar { display: none; }
+html.native-fullscreen .page-wrap { width: 100%; height: 100vh; margin: 0; padding: 32px 0 0; }
 html.native-fullscreen .page-wrap::after { left: 50%; }
 html.native-fullscreen .timer-main { min-height: calc(100vh - 62px); }
 .page-wrap::after {
