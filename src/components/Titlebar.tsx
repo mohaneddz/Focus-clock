@@ -10,7 +10,7 @@ export default function Titlebar(props: { mobileMenuOpen?: boolean; onMenuToggle
   // The window is borderless (decorations: false), where tao's native fullscreen
   // is unreliable on Windows. Instead we do borderless fullscreen manually:
   // cover the whole monitor and sit always-on-top so the taskbar is hidden too.
-  let saved: { position: PhysicalPosition; size: PhysicalSize; wasMaximized: boolean } | null = null;
+  let saved: { position: PhysicalPosition; size: PhysicalSize; wasMaximized: boolean; resizable: boolean } | null = null;
 
   const syncMaximized = async () => { if (windowApi && !isFullscreen()) setMaximized(await windowApi.isMaximized()); };
 
@@ -18,7 +18,8 @@ export default function Titlebar(props: { mobileMenuOpen?: boolean; onMenuToggle
     if (!windowApi) return;
     const monitor = await currentMonitor();
     if (!monitor) throw new Error("No monitor information available");
-    saved = { position: await windowApi.outerPosition(), size: await windowApi.outerSize(), wasMaximized: await windowApi.isMaximized() };
+    saved = { position: await windowApi.outerPosition(), size: await windowApi.outerSize(), wasMaximized: await windowApi.isMaximized(), resizable: await windowApi.isResizable() };
+    await windowApi.setResizable(false);
     await windowApi.setAlwaysOnTop(true);
     await windowApi.setPosition(new PhysicalPosition(monitor.position.x, monitor.position.y));
     await windowApi.setSize(new PhysicalSize(monitor.size.width, monitor.size.height));
@@ -29,6 +30,7 @@ export default function Titlebar(props: { mobileMenuOpen?: boolean; onMenuToggle
   const exitFullscreen = async () => {
     if (!windowApi) return;
     await windowApi.setAlwaysOnTop(false);
+    await windowApi.setResizable(saved?.resizable ?? true);
     if (saved?.wasMaximized) {
       await windowApi.setPosition(saved.position);
       await windowApi.maximize();
