@@ -1,6 +1,6 @@
 import { createSignal, onCleanup, onMount } from "solid-js";
 import { currentMonitor, getCurrentWindow, PhysicalPosition, PhysicalSize } from "@tauri-apps/api/window";
-import { Maximize2, Minimize2, Minus, X } from "lucide-solid";
+import { Minus, X } from "lucide-solid";
 import { toast } from "@/config/toast";
 
 export default function Titlebar(props: { mobileMenuOpen?: boolean; onMenuToggle?: () => void }) {
@@ -71,19 +71,23 @@ export default function Titlebar(props: { mobileMenuOpen?: boolean; onMenuToggle
     if ((event.target as HTMLElement).closest("button")) return;
     void windowApi?.startDragging();
   };
+  const handleDoubleClick = (event: MouseEvent) => {
+    if ((event.target as HTMLElement).closest("button")) return;
+    void toggleMaximize();
+  };
   const toggleMaximize = async () => {
     await windowApi?.toggleMaximize();
     await syncMaximized();
   };
 
-  return <header class="titlebar" onMouseDown={startDragging}>
+  return <header class="titlebar" onMouseDown={startDragging} onDblClick={handleDoubleClick}>
     <button type="button" class={`mobile-menu-toggle ${props.mobileMenuOpen ? "is-open" : ""}`} aria-label={props.mobileMenuOpen ? "Close menu" : "Open menu"} aria-controls="main-navigation" aria-expanded={!!props.mobileMenuOpen} onClick={props.onMenuToggle}>
       <span class="menu-icon" aria-hidden="true"><span /><span /><span /></span>
     </button>
     <div class="window-controls">
       <button aria-label="Minimize" class="titlebar-button" onClick={() => void windowApi?.minimize()}><Minus size={16}/></button>
       <button aria-label={maximized() ? "Restore window" : "Maximize"} class="titlebar-button" title="Maximize window (F11 toggles fullscreen)" onClick={() => void toggleMaximize()}>
-        {maximized() ? <Minimize2 size={15}/> : <Maximize2 size={15}/>}
+        {maximized() ? <svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><path d="M5 3h8v8M3 5v8h8" fill="none" stroke="currentColor" stroke-width="1.4"/></svg> : <svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>}
       </button>
       <button aria-label="Close" class="titlebar-button close" onClick={() => void windowApi?.close()}><X size={16}/></button>
     </div>
