@@ -28,7 +28,7 @@
   width: 42px;
   height: 30px;
   padding: 0;
-  border-radius: 7px;
+  border-radius: 0;
   background: transparent;
   color: #a9ccdf;
   transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
@@ -226,7 +226,10 @@
 .about-footer { margin-top: 35px; text-align: center; }
 
 html.native-fullscreen .titlebar { display: none; }
+html.native-fullscreen .app { --sidebar-width: 0px; grid-template-columns: 0 minmax(0, 1fr); }
+html.native-fullscreen .sidebar { width: 0; min-width: 0; padding-inline: 0; border: 0; opacity: 0; pointer-events: none; }
 html.native-fullscreen .page-wrap { height: 100vh; margin-top: 0; padding-top: 32px; }
+html.native-fullscreen .page-wrap::after { left: 50%; }
 html.native-fullscreen .timer-main { min-height: calc(100vh - 62px); }
 .page-wrap::after {
   top: calc(90px + min(19.5vw, 32vh, 310px));
