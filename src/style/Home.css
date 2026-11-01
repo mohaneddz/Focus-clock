@@ -266,14 +266,14 @@ html.focus-mode .home-actions { opacity: 0; visibility: hidden; transform: trans
 html.focus-mode .focus-exit-hint { opacity: .75; transform: translate(-50%, 0); }
 html.focus-mode .titlebar { opacity: 0; pointer-events: none; }
 html.focus-mode .timer-main { min-height: calc(100vh - 60px); }
-html.focus-mode .timer-main > .clock-face { width: min(76vw, 86vh, 900px); min-width: 0; }
+html.focus-mode .timer-main > .clock-face { width: min(76vw, 86vh, 900px); height: min(76vw, 86vh, 900px); min-width: 0; }
 html.focus-mode .timer-main .timer-actions { opacity: 0; pointer-events: none; transform: translate(-50%, 18px); }
 html.focus-mode .pomodoro { display: block; min-height: calc(100vh - 60px); }
 html.focus-mode .pomodoro > div:first-child { display: grid; height: 100%; place-items: center; }
 html.focus-mode .pomodoro .tabs,
 html.focus-mode .pomodoro .pomodoro-actions,
 html.focus-mode .pomodoro .today { display: none; }
-html.focus-mode .pomodoro .clock-face { width: min(76vw, 86vh, 900px); margin: 0; }
+html.focus-mode .pomodoro .clock-face { width: min(76vw, 86vh, 900px); height: min(76vw, 86vh, 900px); margin: 0; }
 
 @media (max-width: 700px) {
   .timer-main > .clock-face { width: min(85vw, 520px); }
@@ -322,6 +322,7 @@ html.focus-mode .pomodoro .clock-face { width: min(76vw, 86vh, 900px); margin: 0
 .home-clock,
 .timer-main > .clock-face,
 .pomodoro .clock-face { container-type: inline-size; }
+
 
 .home-clock-content .eyebrow {
   margin-bottom: clamp(16px, 6cqi, 43px);
