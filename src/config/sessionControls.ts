@@ -7,7 +7,6 @@ let pending = Promise.resolve();
 
 // Keep the last used session available even after its route unmounts.
 export function selectSession(kind: "timer" | "pomodoro", controls: SessionControls) {
-  if (current && current.kind !== kind) current.controls.pause();
   current = { kind, controls };
 }
 

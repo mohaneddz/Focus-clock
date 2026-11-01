@@ -1,57 +1,37 @@
 import { createSignal, createEffect } from "solid-js";
 import { A, useParams, useNavigate } from "@solidjs/router";
 import { Pause, Play, RotateCcw, Square, Volume2, VolumeX } from "lucide-solid";
-import { getStoreValue, setStoreValue } from "@/config/store";
+import { getStoreValue } from "@/config/store";
 import useTickingSound from "@/hooks/useTickingSound";
 import { selectSession } from "@/config/sessionControls";
+import { initTimerSessions, pauseTimer, resetTimer, startTimer, timerRemaining, timerRunning, type TimerData } from "@/config/timerSessions";
 import ClockRing from "@/components/ClockRing";
 
-type TimerData = { id: number; title: string; duration: number };
 const fmt = (seconds: number) => `${Math.floor(seconds / 60).toString().padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`;
-
-// Module-level state so a running countdown survives navigating to another
-// route and back (e.g. Timer -> Settings -> Timer) instead of resetting. Only
-// one timer can run at a time, so it's reset when a *different* timer id mounts.
-let activeTimerId: number | null = null;
-const [left, setLeft] = createSignal(0);
-const [running, setRunning] = createSignal(false);
-let end = 0;
-let tick: number | undefined;
 
 export default function TimerMain() {
   const params = useParams();
   const navigate = useNavigate();
   let loadVersion = 0;
   const [timer, setTimer] = createSignal<TimerData | null>(null);
+  const left = () => timerRemaining(timer());
+  const running = () => timerRunning(timer()?.id ?? -1);
   const { muted, toggleMuted } = useTickingSound(left, running);
 
-  const complete = async () => {
-    const currentTimer = timer();
-    if (!currentTimer) return;
-    const history = (await getStoreValue<any[]>("timer-history")) || [];
-    void setStoreValue("timer-history", [{ title: currentTimer.title, duration: currentTimer.duration, at: "Just now" }, ...history].slice(0, 20));
-  };
-  const update = () => {
-    const next = Math.max(0, Math.ceil((end - Date.now()) / 1000));
-    setLeft(next);
-    if (!next) {
-      setRunning(false);
-      clearInterval(tick);
-      void complete();
-    }
+  const pause = () => { const current = timer(); if (current) pauseTimer(current); };
+  const reset = () => { const current = timer(); if (current) resetTimer(current); };
+  const toggle = () => {
+    const current = timer();
+    if (!current) return;
+    if (running()) pauseTimer(current); else startTimer(current);
   };
 
   const loadTimer = async (id: number) => {
     const version = ++loadVersion;
-    const found = ((await getStoreValue<TimerData[]>("timers")) || []).find((item) => item.id === id);
+    const [timers] = await Promise.all([getStoreValue<TimerData[]>("timers"), initTimerSessions()]);
     if (version !== loadVersion) return;
-    setTimer(found || null);
-    if (activeTimerId !== id) {
-      activeTimerId = id;
-      clearInterval(tick);
-      setRunning(false);
-      setLeft(found?.duration || 0);
-    }
+    const found = (timers || []).find(item => item.id === id) || null;
+    setTimer(found);
     if (found) selectSession("timer", { "play-pause": toggle, stop: reset, reset, next: () => adjacent(1), previous: () => adjacent(-1), pause });
   };
   createEffect(() => { void loadTimer(Number(params.id)); });
@@ -59,34 +39,14 @@ export default function TimerMain() {
   const adjacent = async (direction: number) => {
     const timers = (await getStoreValue<TimerData[]>("timers")) || [];
     if (!timers.length) return;
-    const index = timers.findIndex(item => item.id === activeTimerId);
+    const index = timers.findIndex(item => item.id === timer()?.id);
     const next = timers[(index + direction + timers.length) % timers.length];
-    const resume = running();
-    pause();
+    const startNext = running();
+    // Each saved timer owns its deadline. Selecting another leaves this one running.
     await loadTimer(next.id);
-    if (resume) toggle();
+    if (startNext && !timerRunning(next.id)) startTimer(next);
     // Selecting a different preset should also show which timer is now controlled.
     navigate(`/timer/${next.id}`);
-  };
-  const pause = () => {
-    if (running()) update();
-    clearInterval(tick);
-    setRunning(false);
-  };
-  const toggle = () => {
-    if (running()) {
-      pause();
-    } else if (timer()) {
-      if (left() <= 0) setLeft(timer()!.duration);
-      end = Date.now() + left() * 1000;
-      tick = window.setInterval(update, 250);
-      setRunning(true);
-    }
-  };
-  const reset = () => {
-    clearInterval(tick);
-    setRunning(false);
-    setLeft(timer()?.duration || 0);
   };
   const timeParts = () => fmt(left()).split(":");
 

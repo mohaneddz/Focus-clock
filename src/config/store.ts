@@ -1,17 +1,19 @@
 import { load, Store } from '@tauri-apps/plugin-store';
 
 let store: Store;
+let initializing: Promise<Store> | undefined;
 
 export const initStore = async (filename = 'store.json') => {
-	store = await load(filename, {
+	if (store) return store;
+	initializing ??= load(filename, {
         autoSave: true,
         defaults: {}
-    });
-	return store;
+    }).then(value => (store = value)).catch(error => { initializing = undefined; throw error; });
+	return initializing;
 };
 
 export const setStoreValue = async <T>(key: string, value: T): Promise<void> => {
-	if (!store) throw new Error('Store not initialized');
+	if (!store) await initStore();
 	await store.set(key, value);
 };
 

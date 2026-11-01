@@ -12,6 +12,8 @@ import { focusMode, setFocusMode } from "@/config/focusMode";
 import { loadSoundPrefs } from "@/config/sounds";
 import { loadClockSettings } from "@/config/clockSettings";
 import { listenForSessionShortcuts } from "@/config/sessionControls";
+import { initTimerSessions } from "@/config/timerSessions";
+import { initPomodoroSession } from "@/config/pomodoroSession";
 
 const Home = lazy(() => import("@/routes/Home"));
 const Timers = lazy(() => import("@/routes/timer/TimerGallery"));
@@ -46,6 +48,8 @@ export default function App() {
     onCleanup(() => { disposed = true; unlisten?.(); });
     void loadSoundPrefs();
     void loadClockSettings();
+    void initTimerSessions().catch(console.error);
+    void initPomodoroSession().catch(console.error);
     const onKeyDown = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.code === "KeyS") {
         event.preventDefault();
