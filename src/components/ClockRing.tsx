@@ -1,4 +1,5 @@
-const R = 48;
+// Match the clock face's outer accent arc instead of crossing the dial ticks.
+const R = 49.8;
 const C = 2 * Math.PI * R;
 
 /** Depleting progress outline for a countdown face. `progress` is 1 at the start and drops to 0 as time runs out. */

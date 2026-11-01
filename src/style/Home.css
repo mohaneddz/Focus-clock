@@ -323,6 +323,17 @@ html.focus-mode .pomodoro .clock-face { width: min(76vw, 86vh, 900px); height: m
 .timer-main > .clock-face,
 .pomodoro .clock-face { container-type: inline-size; }
 
+/* Countdown progress follows the same fine outer accent as the main clock.
+   Keep SVG dimensions square even while the face resizes in focus mode. */
+.clock-face > .clock-ring {
+  inset: -4px;
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
+}
+.clock-ring-track { stroke-width: 1; }
+.clock-ring-progress { stroke-width: 2; }
+.clock-ring circle { vector-effect: non-scaling-stroke; }
+
 
 .home-clock-content .eyebrow {
   margin-bottom: clamp(16px, 6cqi, 43px);
