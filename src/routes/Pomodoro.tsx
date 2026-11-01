@@ -29,6 +29,7 @@ export default function Pomodoro() {
       <button class={mode() === "long" ? "active" : ""} onClick={() => chooseMode("long")}>Long break<br />{config().longBreakTimeSeconds / 60}</button>
     </div>
     <div class="clock-face">
+      <div class="clock-halo" aria-hidden="true" />
       <ClockRing progress={duration() ? left() / duration() : 0} />
       <div class="clock-content"><p class="eyebrow">{label()}</p><div class="time">{fmt(left())}</div><p class="date">{mode() === "focus" ? "Stay with one task" : "Take a breath"}</p></div>
       <button class="clock-sound-toggle" type="button" aria-label={muted() ? "Unmute clock ticking" : "Mute clock ticking"} aria-pressed={muted()} onClick={toggleMuted}>{muted() ? <VolumeX /> : <Volume2 />}</button>

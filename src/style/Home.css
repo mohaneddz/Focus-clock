@@ -268,7 +268,7 @@ html.focus-mode .titlebar { opacity: 0; pointer-events: none; }
 html.focus-mode .timer-main { min-height: calc(100vh - 60px); }
 html.focus-mode .timer-main > .clock-face { width: min(76vw, 86vh, 900px); height: min(76vw, 86vh, 900px); min-width: 0; }
 html.focus-mode .timer-main .timer-actions { opacity: 0; pointer-events: none; transform: translate(-50%, 18px); }
-html.focus-mode .pomodoro { display: block; min-height: calc(100vh - 60px); }
+html.focus-mode .pomodoro { display: block; height: calc(100dvh - 60px); min-height: 0; }
 html.focus-mode .pomodoro > div:first-child { display: grid; height: 100%; place-items: center; }
 html.focus-mode .pomodoro .tabs,
 html.focus-mode .pomodoro .pomodoro-actions,
@@ -333,6 +333,22 @@ html.focus-mode .pomodoro .clock-face { width: min(76vw, 86vh, 900px); height: m
 .clock-ring-track { stroke-width: 1; }
 .clock-ring-progress { stroke-width: 2; }
 .clock-ring circle { vector-effect: non-scaling-stroke; }
+
+/* Tie the atmospheric circle to the dial itself on both session pages. */
+.page-wrap:has(> .timer-main)::after,
+.page-wrap:has(> .pomodoro)::after { display: none; }
+.clock-halo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(90vw, 1200px);
+  aspect-ratio: 1 / 1;
+  border: 9px solid #21617d2e;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+html.focus-mode .clock-halo { width: min(90vw, calc(100dvh - 64px), 1200px); }
 
 
 .home-clock-content .eyebrow {

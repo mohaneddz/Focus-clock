@@ -52,6 +52,7 @@ export default function TimerMain() {
 
   return <section class="page timer-main">
     <div class="clock-face">
+      <div class="clock-halo" aria-hidden="true" />
       <ClockRing progress={(timer()?.duration || 0) ? left() / (timer()!.duration) : 0} />
       <div class="clock-content">
         <p class="eyebrow">Countdown</p>
